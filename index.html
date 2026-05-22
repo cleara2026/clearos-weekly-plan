@@ -188,6 +188,9 @@ main { max-width: 1400px; margin: 0 auto; padding: 32px 40px 80px; }
 .obs-box { border-radius: 10px; padding: 13px 16px; font-size: 14px; color: var(--grey-dark); line-height: 1.55; border: 1px solid var(--grey-border); border-left: 3px solid var(--teal-dark); background: var(--white); margin-bottom: 20px; }
 .obs-box.warn { border-left-color: var(--orange); }
 .obs-box.over { border-left-color: var(--red); }
+.urgency-friction { padding: 12px 16px; font-size: 13px; line-height: 1.55; color: var(--grey-dark); background: #fff0f0; border-top: 1px solid #ffd0d0; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; }
+.delta-callout { border-radius: 8px; padding: 11px 14px; font-size: 13px; color: var(--grey-dark); line-height: 1.5; border: 1px solid #fdd8a8; background: #fff8f0; margin-bottom: 12px; }
+.delta-callout strong { color: var(--orange); }
 
 /* ---- Drag handles ---- */
 .drag-handle { cursor: grab; color: var(--grey-border); padding: 0 6px 0 2px; flex-shrink: 0; display: flex; align-items: center; transition: color .12s; }
@@ -866,6 +869,7 @@ function renderP4() {
     <div class="card" id="urgentList">
       ${rows || '<div style="text-align:center;padding:32px;color:var(--grey-mid);font-style:italic">No tasks to prioritise.</div>'}
       ${urgentCount > 0 ? `<div class="totals-row"><span><strong>${urgentCount}</strong> task${urgentCount!==1?'s':''} marked urgent</span></div>` : ''}
+      ${urgentCount > 3 ? `<div class="urgency-friction">You have <strong>${urgentCount} urgent tasks.</strong> In this run through, urgent means it <strong>has to be done by this time next week — or you're in trouble.</strong> The next pass (High) is the things you want to get done if capacity allows.</div>` : ''}
     </div>
     <div class="step-nav">
       <button class="btn btn-ghost" onclick="prev()">← Estimate</button>
@@ -992,6 +996,12 @@ function renderP6() {
   if (ratio > 1.8) { ratioClass = 'over'; obsClass = 'over'; }
   else if (ratio > 1.1) { ratioClass = 'warn'; obsClass = 'warn'; }
 
+  const urgHighTasks = S.tasks.filter(t => !t.wse && (t.priority === 'Urgent' || t.priority === 'High'));
+  const unestimated = urgHighTasks.filter(t => !t.minutes).length;
+  const unestimatedHtml = unestimated > 0
+    ? `<div class="delta-callout"><strong>${unestimated} urgent/high task${unestimated !== 1 ? 's have' : ' has'} no time estimate</strong> — your actual commitment is likely higher than shown below.</div>`
+    : '';
+
   const lastWeekA = S.history.length > 0 ? S.history[S.history.length - 1] : null;
   const lastWeekRatio = lastWeekA && lastWeekA.capacity > 0 ? lastWeekA.planned / lastWeekA.capacity : 0;
   const historyNote = lastWeekA && lastWeekA.capacity > 0
@@ -999,6 +1009,7 @@ function renderP6() {
     : '';
 
   const realityHtml = cap > 0 ? `
+    ${unestimatedHtml}
     <div class="reality-strip">
       <div class="reality-card">
         <div class="reality-lbl">Urgent + High Work</div>
@@ -1008,7 +1019,7 @@ function renderP6() {
       <div class="reality-card">
         <div class="reality-lbl">Available Capacity</div>
         <div class="reality-val ok">${cap}<span style="font-size:13px;font-weight:400;color:var(--grey-mid)"> min</span></div>
-        <div class="reality-sub">${fmtMins(cap)||'—'} of usable time</div>
+        <div class="reality-sub">${fmtMins(cap)||'—'} usable (50% of meeting-free)</div>
       </div>
       <div class="reality-card">
         <div class="reality-lbl">${delta >= 0 ? 'Overcommitted' : 'Capacity Remaining'}</div>
@@ -1021,7 +1032,7 @@ function renderP6() {
         <div class="reality-sub">${ratio > 0 ? (ratio >= 1 ? Math.round((ratio-1)*100)+'% over capacity' : Math.round((1-ratio)*100)+'% under capacity') : 'no estimates yet'}</div>
       </div>
     </div>
-    <div class="obs-box ${obsClass}">${getRoadmapObs(ratio, cap, committed)}${historyNote}</div>` : '';
+    <div class="obs-box ${obsClass}">${getRoadmapObs(ratio, cap, committed, urgHighTasks.length)}${historyNote}</div>` : '';
 
   // Skip mode — just priority list with drag handles
   if (S.skipAllocation) {
@@ -1262,15 +1273,18 @@ function renderP7() {
     </div>`;
 }
 
-function getRoadmapObs(ratio, cap, committed) {
+function getRoadmapObs(ratio, cap, committed, taskCount) {
   if (cap === 0) return "Enter your meeting-free time above to see your commitment vs capacity.";
   if (committed === 0) return "No time estimates on your urgent or high tasks — add estimates in the Estimate step to see your reality.";
-  if (ratio < 0.6) return `Your committed work is ${Math.round(ratio*100)}% of your available capacity. Either you have significant time remaining, or some tasks are missing estimates.`;
-  if (ratio < 0.9) return "Your committed work is within capacity. Good position to execute from.";
-  if (ratio < 1.1) return "Your committed work is close to your available capacity. Manageable if no unexpected work arrives.";
-  if (ratio < 1.5) return `Your committed work is ${ratio.toFixed(1)}x your available capacity. Expect some carry-over unless lower-priority items slip.`;
-  if (ratio < 2.0) return `Your committed work is ${ratio.toFixed(1)}x your available capacity. Significant carry-over is likely without deliberate reallocation.`;
-  return `Your committed work is ${ratio.toFixed(1)}x your available capacity. This week's plan requires fundamental reallocation to be executable.`;
+  const n = taskCount || 0;
+  const carryEst = ratio > 1 && n > 0 ? Math.round(n * (1 - 1 / ratio)) : 0;
+  const carryStr = carryEst > 0 ? ` At this ratio, roughly <strong>${carryEst} task${carryEst !== 1 ? 's' : ''}</strong> will likely carry over.` : '';
+  if (ratio < 0.6) return `Your committed work is ${Math.round(ratio*100)}% of your available capacity. Either you have room to take on more, or some tasks are still missing estimates.`;
+  if (ratio < 0.9) return "Your committed work is within capacity. Good position to execute from — you have a buffer for the unexpected.";
+  if (ratio < 1.1) return "Your committed work is close to your available capacity. Manageable if nothing unexpected lands this week.";
+  if (ratio < 1.5) return `Your plan is ${ratio.toFixed(1)}x your available capacity.${carryStr} Consider moving lower-priority items to Parked now rather than letting the week decide.`;
+  if (ratio < 2.0) return `Your plan is ${ratio.toFixed(1)}x your available capacity.${carryStr} Significant carry-over is likely — be deliberate about what actually gets done first.`;
+  return `Your plan is ${ratio.toFixed(1)}x your available capacity.${carryStr} This week's list needs fundamental reallocation before it's executable.`;
 }
 
 function setMf(day, v) { S.mf[day] = parseInt(v) || 0; save(); rerender(); }

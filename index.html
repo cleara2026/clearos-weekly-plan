@@ -260,6 +260,13 @@ details.pool-section[open] .pool-chevron { transform: rotate(180deg); }
 .review-sub { font-size: 11px; color: var(--grey-mid); margin-top: 3px; }
 .review-obs-item { background: var(--white); border: 1px solid var(--grey-border); border-left: 3px solid var(--teal-dark); border-radius: 8px; padding: 12px 16px; font-size: 14px; color: var(--grey-dark); line-height: 1.55; margin-bottom: 10px; }
 
+
+/* Allocate parked collapsed group */
+.alloc-parked { border-top: 1px solid var(--grey-border); }
+.alloc-parked-summary { list-style: none; cursor: pointer; user-select: none; padding: 10px 16px; background: var(--grey-light); display: flex; align-items: center; justify-content: space-between; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--grey-dark); }
+.alloc-parked-summary::-webkit-details-marker { display: none; }
+.alloc-parked[open] .pool-chevron { transform: rotate(180deg); }
+
 /* ---- Nav footer ---- */
 .step-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--grey-border); }
 .new-week-bar { text-align: center; margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--grey-border); }
@@ -325,7 +332,7 @@ const SNAPSHOT = null;
 const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
 const TTR = 'Things to Remember';
 const ALL_DAYS = [...DAYS, TTR];
-const STEP_NAMES = ['Clarity','List','Estimate','Urgent Block','High Block','Allocate','Roadmap','Review'];
+const STEP_NAMES = ['Clarity','List','Estimate','Urgent Block','High Block','Allocate','Roadmap'];
 const KEY = 'clearos_v3';
 
 // ---- State ----
@@ -489,8 +496,7 @@ function unskipAlloc() {
 }
 
 // ---- Navigation ----
-const nSteps = () => S.history.length > 0 ? 8 : 7;
-function go(n) { if (n < 1 || n > nSteps()) return; S.step = n; save(); render(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+function go(n) { if (n < 1 || n > 7) return; S.step = n; save(); render(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
 function next() { go(S.step + 1); }
 function prev() { go(S.step - 1); }
 
@@ -526,7 +532,7 @@ function render() {
 }
 
 function renderSteps() {
-  const n = nSteps();
+  const n = 7;
   let h = '';
   for (let i = 1; i <= n; i++) {
     const done = i < S.step, active = i === S.step;
@@ -556,7 +562,7 @@ function rerender() {
 // ============================================================
 function renderP1() {
   maybeAutoSnapshot();
-  const carryover = S.tasks.filter(t => t.priority !== null && !t.wse);
+  const carryover = S.tasks.filter(t => (t.priority === 'Urgent' || t.priority === 'High') && !t.wse);
   const waiting   = S.tasks.filter(t => t.wse);
 
   if (!carryover.length && !waiting.length) {
@@ -938,7 +944,11 @@ function renderP6() {
   let rows = '';
   groups.forEach(g => {
     const gid = g.label === 'Urgent' ? 'allocUrgent' : g.label === 'High' ? 'allocHigh' : 'allocParked';
-    rows += `<div class="card-title" style="background:var(--grey-light)">${g.label} <span style="font-weight:400;opacity:.6">(${g.items.length})</span></div><div id="${gid}">`;
+    if (g.label === 'Parked') {
+      rows += `<details class="alloc-parked"><summary class="alloc-parked-summary"><span>Parked — Not This Week <span style="font-weight:400;opacity:.6">(${g.items.length})</span></span><span class="pool-chevron">▾</span></summary><div id="${gid}">`;
+    } else {
+      rows += `<div class="card-title" style="background:var(--grey-light)">${g.label} <span style="font-weight:400;opacity:.6">(${g.items.length})</span></div><div id="${gid}">`;
+    }
     g.items.forEach(t => {
       const needsDay = t.priority !== 'Parked';
       rows += `<div class="alloc-row" data-id="${t.id}">
@@ -950,7 +960,7 @@ function renderP6() {
           : `<span style="font-size:12px;color:var(--grey-mid)">→ Things to Remember</span>`}
       </div>`;
     });
-    rows += '</div>';  // close group div
+    rows += g.label === 'Parked' ? '</div></details>' : '</div>';  // close group div
   });
 
   // ---- Capacity inputs ----
@@ -1137,7 +1147,6 @@ function renderP7() {
       </div>
       <div class="step-nav">
         <button class="btn btn-ghost" onclick="prev()">← Allocate</button>
-        ${S.history.length > 0 ? `<button class="btn btn-secondary" onclick="go(8)">Review →</button>` : ''}
       </div>`;
   }
 
@@ -1238,7 +1247,6 @@ function renderP7() {
     </div>
     <div class="step-nav">
       <button class="btn btn-ghost" onclick="prev()">← Allocate</button>
-      ${S.history.length > 0 ? `<button class="btn btn-secondary" onclick="go(8)">Review →</button>` : ''}
     </div>`;
 }
 

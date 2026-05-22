@@ -332,9 +332,7 @@ details.pool-section[open] .pool-chevron { transform: rotate(180deg); }
         <div class="logo">CLEAR OS</div>
         <div class="logo-sub">Weekly Plan</div>
       </div>
-      <div class="header-btns">
-        <button class="btn-hdr btn-hdr-reset" onclick="confirmReset()">Start over</button>
-      </div>
+      <div></div>
     </div>
     <div class="step-indicator" id="step-indicator"></div>
     <div class="steps" id="steps"></div>
@@ -1080,7 +1078,10 @@ function renderP6() {
     ${revealHtml}
     <div class="step-nav">
       <button class="btn btn-ghost" onclick="prev()">← High Block</button>
-      <button class="btn btn-primary" onclick="go(7)">Plan my days →</button>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+        <button class="btn btn-primary" onclick="go(7)">Plan my days →</button>
+        <button class="btn btn-ghost" style="font-size:12px;padding:4px 10px;opacity:0.6" onclick="go(7)">Skip capacity check →</button>
+      </div>
     </div>`;
 }
 
@@ -1352,6 +1353,9 @@ function renderP8() {
     </div>
     <div class="step-nav">
       <button class="btn btn-ghost" onclick="prev()">← Allocate</button>
+    </div>
+    <div style="text-align:center;padding:24px 0 8px">
+      <button onclick="confirmReset()" style="background:none;border:none;font-size:12px;color:var(--grey-mid);cursor:pointer;text-decoration:underline;padding:4px 8px" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--grey-mid)'">Start over (clear all data)</button>
     </div>`;
 }
 

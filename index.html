@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#007a78">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="CLEAR OS">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.svg">
+<title>CLEAR OS — Weekly Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --purple: #652d90;
+  --teal: #009a98;
+  --teal-dark: #007a78;
+  --yellow: #edc530;
+  --orange: #f6931e;
+  --red: #eb1c24;
+  --black: #111111;
+  --grey-dark: #404040;
+  --grey-mid: #6b6b6b;
+  --grey-light: #f5f5f5;
+  --grey-border: #e8e8e8;
+  --white: #ffffff;
+  --font-display: 'Outfit', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-font-smoothing: antialiased; }
+body { font-family: var(--font-body); background: var(--grey-light); color: var(--grey-dark); min-height: 100vh; }
+
+/* ---- Header ---- */
+header { background: var(--white); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 20px rgba(0,0,0,0.07); border-bottom: 1px solid var(--grey-border); }
+.header-rainbow { height: 3px; background: linear-gradient(90deg, var(--purple), var(--teal), var(--yellow), var(--orange), var(--red)); }
+.header-inner { padding: 14px 28px 12px; }
+.header-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+
+.logo { font-family: var(--font-display); font-size: 22px; font-weight: 800; color: var(--black); letter-spacing: 0.5px; line-height: 1; }
+.logo-sub { font-family: var(--font-body); font-size: 10px; font-weight: 500; color: var(--teal-dark); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 3px; }
+
+.header-btns { display: flex; gap: 6px; align-items: center; }
+.btn-hdr { font-family: var(--font-body); font-size: 12px; color: var(--grey-mid); background: none; border: 1px solid var(--grey-border); border-radius: 6px; padding: 6px 12px; cursor: pointer; transition: color .15s, border-color .15s; }
+.btn-hdr:hover { color: var(--grey-dark); border-color: var(--grey-mid); }
+.btn-hdr-primary { background: var(--black); color: var(--white) !important; border-color: var(--black) !important; }
+.btn-hdr-primary:hover { background: var(--teal-dark) !important; border-color: var(--teal-dark) !important; }
+.btn-hdr-reset:hover { color: var(--red) !important; border-color: var(--red) !important; }
+
+/* ---- Step nav ---- */
+.steps { display: flex; align-items: center; overflow-x: auto; padding-bottom: 2px; }
+.step-btn { display: flex; align-items: center; gap: 7px; padding: 6px 10px; border: none; background: none; cursor: pointer; font-family: var(--font-body); font-size: 12px; font-weight: 500; color: var(--grey-mid); border-radius: 6px; transition: background .15s, color .15s; white-space: nowrap; }
+.step-btn:hover { background: var(--grey-light); color: var(--grey-dark); }
+.step-btn.active { color: var(--black); background: var(--grey-light); }
+.step-btn.done { color: var(--teal-dark); }
+.step-num { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; border: 1.5px solid var(--grey-border); flex-shrink: 0; }
+.step-btn.active .step-num { background: var(--black); color: var(--white); border-color: var(--black); }
+.step-btn.done .step-num { background: var(--teal-dark); color: var(--white); border-color: var(--teal-dark); }
+.step-divider { width: 16px; height: 1px; background: var(--grey-border); flex-shrink: 0; }
+
+/* ---- Main layout ---- */
+main { max-width: 1400px; margin: 0 auto; padding: 32px 40px 80px; }
+.panel-title { font-family: var(--font-display); font-size: 26px; font-weight: 700; color: var(--black); margin-bottom: 4px; }
+.panel-hint { font-size: 14px; color: var(--grey-mid); margin-bottom: 28px; }
+
+/* ---- Cards / sections ---- */
+.card { background: var(--white); border: 1px solid var(--grey-border); border-radius: 10px; margin-bottom: 16px; overflow: hidden; }
+.card-title { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--grey-dark); padding: 12px 16px; border-bottom: 1px solid var(--grey-border); }
+
+/* ---- Health warnings ---- */
+.warn-banner { display: flex; gap: 14px; padding: 16px 18px; border-radius: 10px; margin-bottom: 16px; }
+.warn-urgent { background: #fff0f0; border: 1px solid var(--red); }
+.warn-high { background: #fff8f0; border: 1px solid var(--orange); }
+.warn-icon { font-size: 22px; flex-shrink: 0; line-height: 1.3; }
+.warn-title { font-family: var(--font-display); font-weight: 700; font-size: 14px; margin-bottom: 4px; color: var(--black); }
+.warn-text { font-size: 13px; color: var(--grey-dark); line-height: 1.5; }
+
+/* ---- Clarity rows ---- */
+.clarity-row { display: flex; align-items: flex-start; gap: 10px; padding: 11px 16px; border-bottom: 1px solid var(--grey-border); }
+.clarity-row:last-child { border-bottom: none; }
+.clarity-row-body { flex: 1; }
+.clarity-row-name { font-size: 14px; color: var(--black); line-height: 1.4; margin-bottom: 4px; }
+.clarity-row-meta { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+.clarity-actions { display: flex; gap: 6px; flex-shrink: 0; align-items: flex-start; }
+.ibtn { font-family: var(--font-body); font-size: 12px; font-weight: 500; padding: 5px 10px; border-radius: 6px; border: none; cursor: pointer; transition: background .12s; }
+.i-done { background: #f0fff4; color: #1a7a40; border: 1px solid #b8e8c8; }
+.i-done:hover { background: #dcfaea; }
+.i-carry { background: var(--grey-light); color: var(--grey-dark); border: 1px solid var(--grey-border); }
+.i-carry:hover { background: var(--grey-border); }
+.i-todo { background: #f0f8ff; color: var(--teal-dark); border: 1px solid #b8dff0; }
+.i-todo:hover { background: #daf0ff; }
+
+/* ---- Badges ---- */
+.badge { display: inline-flex; align-items: center; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 10px; text-transform: uppercase; letter-spacing: 0.04em; }
+.badge-urgent { background: #fff0f0; color: var(--red); border: 1px solid #ffc8c8; }
+.badge-high { background: #fff8f0; color: var(--orange); border: 1px solid #fdd8a8; }
+.badge-parked { background: var(--grey-light); color: var(--grey-mid); border: 1px solid var(--grey-border); }
+.badge-day { background: #f0f8ff; color: var(--teal-dark); border: 1px solid #b8dff0; }
+.badge-mins { background: var(--grey-light); color: var(--grey-mid); border: 1px solid var(--grey-border); }
+
+/* ---- Fresh state ---- */
+.fresh-state { text-align: center; padding: 44px 20px; color: var(--grey-mid); }
+.fresh-icon { font-size: 32px; margin-bottom: 12px; }
+.fresh-state h3 { font-family: var(--font-display); font-size: 18px; color: var(--black); margin-bottom: 8px; }
+.fresh-state p { font-size: 14px; }
+
+/* ---- Task list (List step) ---- */
+.add-row { display: flex; gap: 8px; padding: 12px 16px; background: var(--grey-light); border-bottom: 1px solid var(--grey-border); }
+.add-input { flex: 1; border: 1px solid var(--grey-border); border-radius: 7px; padding: 8px 12px; font-family: var(--font-body); font-size: 14px; outline: none; background: var(--white); }
+.add-input:focus { border-color: var(--teal-dark); }
+.task-row { display: flex; align-items: flex-start; gap: 10px; padding: 10px 16px; border-bottom: 1px solid var(--grey-border); }
+.task-row:last-child { border-bottom: none; }
+.task-text { flex: 1; font-size: 14px; color: var(--black); line-height: 1.4; }
+.task-actions { display: flex; gap: 5px; flex-shrink: 0; align-items: flex-start; }
+.edit-input { flex: 1; border: 1px solid var(--teal-dark); border-radius: 6px; padding: 6px 10px; font-family: var(--font-body); font-size: 14px; outline: none; }
+.notes-area { width: 100%; border: 1px solid var(--grey-border); border-radius: 6px; padding: 8px 10px; font-family: var(--font-body); font-size: 13px; resize: vertical; outline: none; min-height: 56px; margin-top: 4px; }
+.notes-area:focus { border-color: var(--teal-dark); }
+.totals-row { display: flex; gap: 16px; align-items: center; padding: 9px 16px; background: var(--grey-light); border-top: 1px solid var(--grey-border); font-size: 13px; color: var(--grey-mid); }
+.totals-row strong { color: var(--black); }
+
+/* ---- Estimate ---- */
+.est-row { display: flex; align-items: center; gap: 12px; padding: 10px 16px; border-bottom: 1px solid var(--grey-border); }
+.est-row:last-child { border-bottom: none; }
+.est-task { flex: 1; font-size: 14px; color: var(--black); }
+.est-input { width: 80px; border: 1px solid var(--grey-border); border-radius: 6px; padding: 7px 10px; font-family: var(--font-body); font-size: 14px; text-align: center; outline: none; }
+.est-input:focus { border-color: var(--teal-dark); }
+.est-unit { font-size: 13px; color: var(--grey-mid); width: 26px; }
+
+/* ---- Priority rows (Urgent/High blocks) ---- */
+.pri-row { display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-bottom: 1px solid var(--grey-border); transition: background .12s; }
+.pri-row:last-child { border-bottom: none; }
+.pri-row.is-urgent { background: #fff8f8; }
+.pri-row.is-high { background: #fffaf5; }
+.pri-row-text { flex: 1; font-size: 14px; color: var(--black); line-height: 1.35; }
+.pri-row-mins { font-size: 12px; color: var(--grey-mid); flex-shrink: 0; }
+
+/* ---- Buttons ---- */
+.btn { font-family: var(--font-body); font-size: 13px; font-weight: 500; padding: 7px 16px; border-radius: 7px; border: none; cursor: pointer; transition: background .15s, transform .1s; }
+.btn:hover { transform: translateY(-1px); }
+.btn-primary { background: var(--black); color: var(--white); }
+.btn-primary:hover { background: var(--teal-dark); }
+.btn-secondary { background: var(--grey-light); color: var(--grey-dark); border: 1px solid var(--grey-border); }
+.btn-secondary:hover { background: var(--grey-border); }
+.btn-ghost { background: none; color: var(--grey-mid); border: 1px solid transparent; }
+.btn-ghost:hover { color: var(--grey-dark); border-color: var(--grey-border); transform: none; }
+.btn-outline { background: transparent; color: var(--black); border: 1.5px solid var(--black); }
+.btn-outline:hover { background: var(--black); color: var(--white); }
+.btn-sm { font-size: 12px; padding: 5px 10px; }
+.btn-danger { background: #fff0f0; color: var(--red); border: 1px solid #ffd0d0; }
+.btn-danger:hover { background: #ffe0e0; }
+
+/* Urgent / High toggle buttons */
+.btn-mark-urgent { background: var(--grey-light); color: var(--grey-dark); border: 1px solid var(--grey-border); font-size: 12px; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-family: var(--font-body); transition: all .12s; }
+.btn-mark-urgent:hover { border-color: var(--red); color: var(--red); }
+.btn-mark-urgent.on { background: var(--red); color: var(--white); border-color: var(--red); }
+.btn-mark-high { background: var(--grey-light); color: var(--grey-dark); border: 1px solid var(--grey-border); font-size: 12px; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-family: var(--font-body); transition: all .12s; }
+.btn-mark-high:hover { border-color: var(--orange); color: var(--orange); }
+.btn-mark-high.on { background: var(--orange); color: var(--white); border-color: var(--orange); }
+
+/* ---- Allocate ---- */
+.alloc-row { display: flex; align-items: center; gap: 10px; padding: 9px 16px; border-bottom: 1px solid var(--grey-border); }
+.alloc-row:last-child { border-bottom: none; }
+.alloc-task { flex: 1; font-size: 14px; color: var(--black); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.alloc-mins { font-size: 12px; color: var(--grey-mid); flex-shrink: 0; }
+.day-select { border: 1px solid var(--grey-border); border-radius: 6px; padding: 5px 7px; font-family: var(--font-body); font-size: 12px; color: var(--grey-dark); outline: none; background: var(--white); flex-shrink: 0; }
+.day-select:focus { border-color: var(--teal-dark); }
+
+/* ---- Roadmap capacity ---- */
+.mf-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+.mf-cell { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+.mf-day-lbl { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--grey-mid); }
+.mf-input { width: 100%; border: 1px solid var(--grey-border); border-radius: 7px; padding: 9px 4px; font-family: var(--font-body); font-size: 14px; text-align: center; outline: none; }
+.mf-input:focus { border-color: var(--teal-dark); }
+
+/* Reality delta */
+.reality-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 16px 0; }
+.reality-card { background: var(--white); border: 1px solid var(--grey-border); border-radius: 10px; padding: 14px 16px; }
+.reality-lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--grey-mid); margin-bottom: 5px; }
+.reality-val { font-family: var(--font-display); font-size: 28px; font-weight: 700; color: var(--black); line-height: 1; }
+.reality-val.ok { color: var(--teal-dark); }
+.reality-val.warn { color: var(--orange); }
+.reality-val.over { color: var(--red); }
+.reality-sub { font-size: 11px; color: var(--grey-mid); margin-top: 3px; }
+.obs-box { border-radius: 10px; padding: 13px 16px; font-size: 14px; color: var(--grey-dark); line-height: 1.55; border: 1px solid var(--grey-border); border-left: 3px solid var(--teal-dark); background: var(--white); margin-bottom: 20px; }
+.obs-box.warn { border-left-color: var(--orange); }
+.obs-box.over { border-left-color: var(--red); }
+
+/* ---- Day capacity strip (Allocate) ---- */
+.day-strip { display: flex; flex-wrap: wrap; gap: 8px; }
+.day-chip { background: var(--white); border: 1px solid var(--grey-border); border-radius: 8px; padding: 8px 12px; min-width: 100px; flex: 1; }
+.day-chip-name { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--grey-dark); margin-bottom: 6px; }
+.day-chip-bar { height: 4px; background: var(--grey-border); border-radius: 2px; margin-bottom: 5px; overflow: hidden; }
+.day-chip-fill { height: 4px; border-radius: 2px; transition: width .2s; }
+.day-chip-nums { font-size: 11px; color: var(--grey-mid); }
+
+/* ---- Day cards (Roadmap) ---- */
+.day-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+.day-card { background: var(--white); border: 1px solid var(--grey-border); border-radius: 10px; overflow: hidden; }
+.day-card-head { padding: 9px 13px; background: var(--grey-light); border-bottom: 1px solid var(--grey-border); display: flex; justify-content: space-between; align-items: center; }
+.day-card-name { font-family: var(--font-display); font-size: 13px; font-weight: 700; color: var(--black); }
+.day-card-cap { font-size: 11px; color: var(--grey-mid); }
+.cap-bar { height: 3px; background: var(--grey-border); }
+.cap-fill { height: 3px; background: var(--teal-dark); }
+.cap-fill.over { background: var(--red); }
+.day-task { display: flex; align-items: flex-start; gap: 6px; padding: 8px 12px; border-bottom: 1px solid var(--grey-border); }
+.day-task:last-child { border-bottom: none; }
+.pri-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+.pri-dot.urgent { background: var(--red); }
+.pri-dot.high { background: var(--orange); }
+.day-task-text { flex: 1; font-size: 13px; color: var(--black); line-height: 1.35; }
+.day-task-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
+.day-task-mins { font-size: 11px; color: var(--grey-mid); }
+.day-task-btns { display: flex; gap: 3px; }
+.btn-done { background: #f0fff4; color: #1a7a40; border: 1px solid #b8e8c8; font-size: 11px; padding: 3px 8px; border-radius: 5px; cursor: pointer; font-family: var(--font-body); }
+.btn-done:hover { background: #dcfaea; }
+.btn-wse { background: #fff8f0; color: var(--orange); border: 1px solid #fde0b8; font-size: 11px; padding: 3px 8px; border-radius: 5px; cursor: pointer; font-family: var(--font-body); white-space: nowrap; }
+.btn-wse:hover { background: #feeedd; }
+.day-empty { padding: 14px 12px; font-size: 13px; color: var(--grey-mid); font-style: italic; }
+
+/* ---- Pool sections (TTR / Parked / WSE) ---- */
+.pool-section { background: var(--white); border: 1px solid var(--grey-border); border-radius: 10px; overflow: hidden; margin-top: 12px; }
+.pool-head { padding: 10px 14px; background: var(--grey-light); border-bottom: 1px solid var(--grey-border); display: flex; align-items: center; justify-content: space-between; }
+.pool-head-title { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--grey-dark); }
+.pool-badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; color: var(--white); }
+.pool-task { display: flex; align-items: center; gap: 8px; padding: 9px 14px; border-bottom: 1px solid var(--grey-border); font-size: 13px; }
+.pool-task:last-child { border-bottom: none; }
+.pool-task-text { flex: 1; color: var(--black); }
+
+/* ---- Review ---- */
+.review-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+.review-card { background: var(--white); border: 1px solid var(--grey-border); border-radius: 10px; padding: 16px 18px; }
+.review-lbl { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--grey-mid); margin-bottom: 6px; }
+.review-val { font-family: var(--font-display); font-size: 28px; font-weight: 700; color: var(--black); line-height: 1; }
+.review-sub { font-size: 11px; color: var(--grey-mid); margin-top: 3px; }
+.review-obs-item { background: var(--white); border: 1px solid var(--grey-border); border-left: 3px solid var(--teal-dark); border-radius: 8px; padding: 12px 16px; font-size: 14px; color: var(--grey-dark); line-height: 1.55; margin-bottom: 10px; }
+
+/* ---- Nav footer ---- */
+.step-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--grey-border); }
+.new-week-bar { text-align: center; margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--grey-border); }
+.new-week-hint { font-size: 13px; color: var(--grey-mid); margin-bottom: 12px; }
+
+/* ---- Print ---- */
+@media print {
+  header { position: static; box-shadow: none; }
+  .header-btns, .steps, .step-nav, .new-week-bar { display: none !important; }
+  body { background: white; }
+  main { padding: 20px; max-width: 100%; }
+  .card, .day-card, .pool-section { box-shadow: none; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .day-cards { grid-template-columns: repeat(4, 1fr); }
+}
+
+@media (max-width: 900px) {
+  main { padding: 24px 20px 60px; }
+  .day-cards { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+}
+
+@media (max-width: 640px) {
+  .reality-strip { grid-template-columns: 1fr 1fr; }
+  .review-grid { grid-template-columns: 1fr 1fr; }
+  .mf-grid { grid-template-columns: repeat(4, 1fr); }
+  .header-inner { padding: 12px 16px 10px; }
+  main { padding: 16px 14px 60px; }
+  .day-cards { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-rainbow"></div>
+  <div class="header-inner">
+    <div class="header-row">
+      <div>
+        <div class="logo">CLEAR OS</div>
+        <div class="logo-sub">Weekly Plan</div>
+      </div>
+      <div class="header-btns">
+        <button class="btn-hdr btn-hdr-reset" onclick="confirmReset()">Start over</button>
+      </div>
+    </div>
+    <div class="steps" id="steps"></div>
+  </div>
+</header>
+
+<main id="main"></main>
+
+<script>
+// ---- State snapshot for saved files (replaced by saveAsFile) ----
+const SNAPSHOT = null;
+
+// ---- Constants ----
+const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+const TTR = 'Things to Remember';
+const ALL_DAYS = [...DAYS, TTR];
+const STEP_NAMES = ['Clarity','List','Estimate','Urgent Block','High Block','Allocate','Roadmap','Review'];
+const KEY = 'clearos_v3';
+
+// ---- State ----
+let S = {
+  step: 1,
+  tasks: [],
+  nextId: 1,
+  mf: { Monday:0, Tuesday:0, Wednesday:0, Thursday:0, Friday:0, Saturday:0, Sunday:0 },
+  completedThisWeek: 0,
+  history: [],
+  lastSnapshotDate: null
+};
+
+// ---- UI state (not persisted) ----
+let sortDir = 'asc';
+let editingId = null;
+let notesOpen = new Set();
+
+// ---- Persistence ----
+function save() { localStorage.setItem(KEY, JSON.stringify(S)); }
+
+function initState() {
+  if (SNAPSHOT !== null) {
+    S = { ...S, ...SNAPSHOT };
+  } else {
+    const raw = localStorage.getItem(KEY);
+    if (raw) try { S = { ...S, ...JSON.parse(raw) }; } catch(e) {}
+  }
+  if (!S.mf) S.mf = { Monday:0, Tuesday:0, Wednesday:0, Thursday:0, Friday:0, Saturday:0, Sunday:0 };
+  if (!S.history) S.history = [];
+}
+
+// ---- Save as file ----
+async function saveAsFile() {
+  const html = document.documentElement.outerHTML;
+  const state = JSON.stringify(S);
+  const modified = html.replace('const SNAPSHOT = null;', `const SNAPSHOT = ${state};`);
+  const today = new Date().toISOString().split('T')[0];
+  const filename = `CLEAROS-${today}.html`;
+  const blob = new Blob([modified], { type: 'text/html' });
+
+  if ('showSaveFilePicker' in window) {
+    try {
+      const handle = await window.showSaveFilePicker({
+        suggestedName: filename,
+        types: [{ description: 'CLEAR OS Plan', accept: { 'text/html': ['.html'] } }]
+      });
+      const writable = await handle.createWritable();
+      await writable.write(blob);
+      await writable.close();
+      return;
+    } catch(e) {
+      if (e.name === 'AbortError') return;
+      // fall through to download fallback
+    }
+  }
+
+  // Fallback — saves to Downloads
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// ---- Auto-snapshot: captures last week's data at the start of a new week ----
+function maybeAutoSnapshot() {
+  const today = new Date().toISOString().split('T')[0];
+  if (S.lastSnapshotDate === today) return;
+  const carry = S.tasks.filter(t => t.priority !== null && !t.wse);
+  if (!carry.length) return;
+
+  S.history.push({
+    weekEnded: today,
+    totalTasks: S.tasks.filter(t => !t.wse).length + S.completedThisWeek,
+    completedTasks: S.completedThisWeek,
+    carryOverTasks: carry.length,
+    carryOverMins: carry.reduce((s,t) => s + (t.minutes||0), 0),
+    urgentRemaining: S.tasks.filter(t => t.priority === 'Urgent' && !t.wse).length,
+    planned: committedMins(),
+    capacity: totalCapacity()
+  });
+
+  S.lastSnapshotDate = today;
+  S.completedThisWeek = 0;
+  save();
+}
+
+// ---- Import saved plan file ----
+function importFile() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.html';
+  input.onchange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const text = await file.text();
+    const marker = 'const SNAPSHOT = ';
+    const idx = text.indexOf(marker);
+    if (idx < 0) { alert('No plan data found in this file. Make sure you\'re opening a saved CLEAROS file.'); return; }
+    const jsonStart = idx + marker.length;
+    const jsonEnd = text.indexOf(';\n', jsonStart);
+    if (jsonEnd < 0) { alert('Could not read this file — it may be corrupted.'); return; }
+    const jsonStr = text.slice(jsonStart, jsonEnd);
+    if (jsonStr === 'null') { alert('This file has no saved plan. Use Save as file from the Roadmap step to create a plan file.'); return; }
+    try {
+      const loaded = JSON.parse(jsonStr);
+      S = { ...S, ...loaded };
+      save(); render();
+    } catch(err) {
+      alert('Could not read the plan file — it may be corrupted.');
+    }
+  };
+  input.click();
+}
+
+// ---- Navigation ----
+const nSteps = () => S.history.length > 0 ? 8 : 7;
+function go(n) { if (n < 1 || n > nSteps()) return; S.step = n; save(); render(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+function next() { go(S.step + 1); }
+function prev() { go(S.step - 1); }
+
+// ---- Helpers ----
+function esc(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function fmtMins(m) {
+  if (!m) return '';
+  if (m < 60) return m + ' min';
+  const h = Math.floor(m / 60), r = m % 60;
+  return h + 'h' + (r ? ' ' + r + 'm' : '');
+}
+function totalPlanned() { return S.tasks.reduce((s,t) => s + (t.minutes||0), 0); }
+function totalCapacity() { return DAYS.reduce((s,d) => s + Math.floor((S.mf[d]||0) / 2), 0); }
+function committedMins() {
+  return S.tasks
+    .filter(t => (t.priority === 'Urgent' || t.priority === 'High') && !t.wse)
+    .reduce((s,t) => s + (t.minutes||0), 0);
+}
+function dayUsed(day) {
+  return S.tasks.filter(t => t.dayBlock === day && t.priority !== 'Parked' && !t.wse)
+    .reduce((s,t) => s + (t.minutes||0), 0);
+}
+function dayCapacity(day) { return Math.floor((S.mf[day]||0) / 2); }
+
+// ---- Render ----
+function render() {
+  renderSteps();
+  const fns = [null, renderP1, renderP2, renderP3, renderP4, renderP5, renderP6, renderP7, renderP8];
+  document.getElementById('main').innerHTML = fns[S.step]();
+  afterRender();
+}
+
+function renderSteps() {
+  const n = nSteps();
+  let h = '';
+  for (let i = 1; i <= n; i++) {
+    const done = i < S.step, active = i === S.step;
+    const cls = done ? 'step-btn done' : active ? 'step-btn active' : 'step-btn';
+    h += `<button class="${cls}" onclick="go(${i})">
+      <div class="step-num">${done ? '✓' : i}</div>
+      <span>${STEP_NAMES[i-1]}</span>
+    </button>`;
+    if (i < n) h += '<div class="step-divider"></div>';
+  }
+  document.getElementById('steps').innerHTML = h;
+}
+
+function afterRender() {
+  if (S.step === 2) { document.getElementById('addInput')?.focus(); }
+}
+
+function rerender() {
+  const fns = [null, renderP1, renderP2, renderP3, renderP4, renderP5, renderP6, renderP7, renderP8];
+  document.getElementById('main').innerHTML = fns[S.step]();
+}
+
+// ============================================================
+// P1 — Clarity
+// ============================================================
+function renderP1() {
+  maybeAutoSnapshot();
+  const carryover = S.tasks.filter(t => t.priority !== null && !t.wse);
+  const waiting   = S.tasks.filter(t => t.wse);
+
+  if (!carryover.length && !waiting.length) {
+    const hasHistory = S.history.length > 0;
+    return `
+      <div class="panel-title">Clarity</div>
+      <div class="panel-hint">Before you plan, know where you stand.</div>
+      <div class="card">
+        <div class="fresh-state">
+          <div class="fresh-icon">✦</div>
+          <h3>You're starting fresh</h3>
+          <p>No tasks carried over from last week. Head to List to begin.</p>
+          ${!hasHistory ? `<div style="margin-top:20px;border-top:1px solid var(--grey-border);padding-top:16px">
+            <button class="btn btn-secondary" onclick="importFile()">Load previous plan</button>
+            <div style="font-size:12px;color:var(--grey-mid);margin-top:8px">Have a saved CLEAROS file from another device? Load it to pick up where you left off.</div>
+          </div>` : ''}
+        </div>
+      </div>
+      <div class="step-nav">
+        <div></div>
+        <button class="btn btn-primary" onclick="next()">Next: List →</button>
+      </div>`;
+  }
+
+  let h = '';
+
+  if (carryover.length) {
+    h += `<div class="card"><div class="card-title">Carried over — not marked done last week</div>`;
+    carryover.forEach(t => {
+      h += `<div class="clarity-row">
+        <div class="clarity-row-body">
+          <div class="clarity-row-name">${esc(t.task)}</div>
+          <div class="clarity-row-meta">
+            ${t.priority ? `<span class="badge badge-${t.priority.toLowerCase()}">${t.priority}</span>` : ''}
+            ${t.dayBlock ? `<span class="badge badge-day">${t.dayBlock}</span>` : ''}
+            ${t.minutes ? `<span class="badge badge-mins">${fmtMins(t.minutes)}</span>` : ''}
+          </div>
+        </div>
+        <div class="clarity-actions">
+          <button class="ibtn i-done" onclick="clarityDone(${t.id})">✓ Done</button>
+          <button class="ibtn i-carry" onclick="clarityCarryForward(${t.id})">↻ Carry Forward</button>
+        </div>
+      </div>`;
+    });
+    h += `</div>`;
+  }
+
+  if (waiting.length) {
+    h += `<div class="card"><div class="card-title">With someone else — waiting on others</div>`;
+    waiting.forEach(t => {
+      h += `<div class="clarity-row">
+        <div class="clarity-row-body">
+          <div class="clarity-row-name">${esc(t.task)}</div>
+          <div class="clarity-row-meta">
+            ${t.minutes ? `<span class="badge badge-mins">${fmtMins(t.minutes)}</span>` : ''}
+            ${t.notes ? `<span style="font-size:12px;color:var(--grey-mid);font-style:italic">${esc(t.notes)}</span>` : ''}
+          </div>
+        </div>
+        <div class="clarity-actions">
+          <button class="ibtn i-done" onclick="clarityDone(${t.id})">✓ Done</button>
+          <button class="ibtn i-todo" onclick="clarityMoveToTodo(${t.id})">→ Move to To Do</button>
+        </div>
+      </div>`;
+    });
+    h += `</div>`;
+  }
+
+  return `
+    <div class="panel-title">Clarity</div>
+    <div class="panel-hint">Before you plan, know where you stand.</div>
+    ${h}
+    <div class="step-nav">
+      <div></div>
+      <button class="btn btn-primary" onclick="next()">Next: List →</button>
+    </div>`;
+}
+
+function clarityDone(id) { S.tasks = S.tasks.filter(t => t.id !== id); save(); rerender(); }
+function clarityCarryForward(id) {
+  const t = S.tasks.find(t => t.id === id);
+  if (t) { t.priority = null; t.dayBlock = null; t.wse = false; t.carriedOver = false; }
+  save(); rerender();
+}
+function clarityMoveToTodo(id) {
+  const t = S.tasks.find(t => t.id === id);
+  if (t) { t.wse = false; t.carriedOver = false; t.priority = null; t.dayBlock = null; }
+  save(); rerender();
+}
+
+// ============================================================
+// P2 — List
+// ============================================================
+function renderP2() {
+  const tasks = S.tasks.filter(t => !t.wse);
+
+  const rows = tasks.length === 0
+    ? `<div style="text-align:center;padding:36px 20px;color:var(--grey-mid);font-size:14px;font-style:italic">Nothing here yet. Type above to add your first task.</div>`
+    : tasks.map(t => {
+        if (editingId === t.id) {
+          return `<div class="task-row">
+            <input class="edit-input" id="edit-${t.id}" value="${esc(t.task)}"
+              onkeydown="editKey(event,${t.id})" />
+            <div class="task-actions">
+              <button class="btn btn-sm btn-primary" onclick="saveEdit(${t.id})">Save</button>
+              <button class="btn btn-sm btn-secondary" onclick="cancelEdit()">Cancel</button>
+            </div>
+          </div>`;
+        }
+        const notesBlock = notesOpen.has(t.id) ? `
+          <div style="padding:0 16px 10px">
+            <textarea class="notes-area" placeholder="Add a note…"
+              onchange="saveNotes(${t.id},this.value)">${esc(t.notes||'')}</textarea>
+          </div>` : '';
+        return `<div>
+          <div class="task-row">
+            <div class="task-text">${esc(t.task)}</div>
+            <div class="task-actions">
+              <button class="btn btn-sm btn-secondary" onclick="toggleNotes(${t.id})" title="Notes">${notesOpen.has(t.id)?'▲':'📝'}</button>
+              <button class="btn btn-sm btn-secondary" onclick="startEdit(${t.id})">Edit</button>
+              <button class="btn btn-sm btn-danger" onclick="delTask(${t.id})">✕</button>
+            </div>
+          </div>${notesBlock}
+        </div>`;
+      }).join('');
+
+  const sortLbl = sortDir === 'asc' ? 'A→Z' : 'Z→A';
+
+  return `
+    <div class="panel-title">List</div>
+    <div class="panel-hint">Get everything out of your head. Press Enter to add, or paste multiple lines at once.</div>
+    <div class="card">
+      <div class="add-row">
+        <input class="add-input" id="addInput" type="text"
+          placeholder="Add a task — Enter to add, or paste a list"
+          onkeydown="addKey(event)" onpaste="pasteHandler(event)" />
+        <button class="btn btn-primary" onclick="addFromInput()">Add</button>
+        ${tasks.length > 1 ? `<button class="btn btn-sm btn-secondary" onclick="toggleSort()">${sortLbl}</button>` : ''}
+      </div>
+      <div id="taskList">${rows}</div>
+      ${tasks.length > 0 ? `<div class="totals-row"><span><strong>${tasks.length}</strong> task${tasks.length!==1?'s':''}</span></div>` : ''}
+    </div>
+    <div class="step-nav">
+      <button class="btn btn-ghost" onclick="prev()">← Clarity</button>
+      <button class="btn btn-primary" onclick="next()">Next: Estimate →</button>
+    </div>`;
+}
+
+function addKey(e) { if (e.key === 'Enter') addFromInput(); }
+
+function pasteHandler(e) {
+  const text = e.clipboardData.getData('text');
+  if (!text.includes('\n')) return;
+  e.preventDefault();
+  text.split(/\r?\n/).map(l => l.trim()).filter(Boolean).forEach(addTask);
+  save(); rerender();
+  document.getElementById('addInput')?.focus();
+}
+
+function addFromInput() {
+  const el = document.getElementById('addInput');
+  if (!el) return;
+  const val = el.value.trim();
+  if (!val) return;
+  val.split(/\r?\n/).map(l => l.trim()).filter(Boolean).forEach(addTask);
+  el.value = ''; save(); rerender();
+  document.getElementById('addInput')?.focus();
+}
+
+function addTask(text) {
+  S.tasks.push({ id: S.nextId++, task: text, notes: '', minutes: null, priority: null, dayBlock: null, wse: false, carriedOver: false });
+}
+
+function delTask(id) { S.tasks = S.tasks.filter(t => t.id !== id); notesOpen.delete(id); save(); rerender(); }
+
+function startEdit(id) { editingId = id; rerender(); document.getElementById('edit-' + id)?.focus(); }
+function saveEdit(id) {
+  const el = document.getElementById('edit-' + id);
+  const t = S.tasks.find(t => t.id === id);
+  if (t && el) t.task = el.value.trim() || t.task;
+  editingId = null; save(); rerender();
+}
+function cancelEdit() { editingId = null; rerender(); }
+function editKey(e, id) { if (e.key === 'Enter') saveEdit(id); if (e.key === 'Escape') cancelEdit(); }
+
+function toggleNotes(id) {
+  notesOpen.has(id) ? notesOpen.delete(id) : notesOpen.add(id);
+  rerender();
+}
+function saveNotes(id, v) { const t = S.tasks.find(t => t.id === id); if (t) { t.notes = v; save(); } }
+
+function toggleSort() {
+  sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+  S.tasks.sort((a,b) => sortDir === 'asc' ? a.task.localeCompare(b.task) : b.task.localeCompare(a.task));
+  save(); rerender();
+}
+
+// ============================================================
+// P3 — Estimate
+// ============================================================
+function renderP3() {
+  const tasks = S.tasks.filter(t => !t.wse);
+
+  if (!tasks.length) return `
+    <div class="panel-title">Estimate</div>
+    <div class="panel-hint">No tasks to estimate yet.</div>
+    <div class="step-nav">
+      <button class="btn btn-ghost" onclick="prev()">← List</button>
+      <button class="btn btn-primary" onclick="next()">Next: Urgent Block →</button>
+    </div>`;
+
+  const rows = tasks.map((t, i) => `
+    <div class="est-row">
+      <span class="est-task">${esc(t.task)}</span>
+      <input class="est-input" type="number" min="0" step="5" tabindex="${i+1}"
+        placeholder="—" value="${t.minutes||''}" id="est_${t.id}"
+        onchange="setMinutes(${t.id},this.value)" />
+      <span class="est-unit">min</span>
+    </div>`).join('');
+
+  const total = totalPlanned();
+  const noEst = tasks.filter(t => !t.minutes).length;
+
+  return `
+    <div class="panel-title">Estimate</div>
+    <div class="panel-hint">How long will each task actually take? Tab between fields. Skip if you genuinely cannot estimate.</div>
+    <div class="card">
+      <div class="card-title" style="display:flex;justify-content:space-between">
+        <span>${tasks.length} tasks</span>
+        <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:12px;color:var(--grey-mid)">Tab to move between fields</span>
+      </div>
+      ${rows}
+      <div class="totals-row" id="estTotals">
+        <span>Total: <strong>${fmtMins(total)||'0 min'}</strong></span>
+        ${noEst > 0 ? `<span>${noEst} without estimate</span>` : `<span style="color:var(--teal-dark)">All tasks estimated ✓</span>`}
+      </div>
+    </div>
+    <div class="step-nav">
+      <button class="btn btn-ghost" onclick="prev()">← List</button>
+      <button class="btn btn-primary" onclick="next()">Next: Urgent Block →</button>
+    </div>`;
+}
+
+function setMinutes(id, v) {
+  const t = S.tasks.find(t => t.id === id);
+  if (t) { t.minutes = parseInt(v) || null; save(); }
+  const total = totalPlanned();
+  const noEst = S.tasks.filter(t => !t.wse && !t.minutes).length;
+  const el = document.getElementById('estTotals');
+  if (el) el.innerHTML = `<span>Total: <strong>${fmtMins(total)||'0 min'}</strong></span>${noEst>0?`<span>${noEst} without estimate</span>`:`<span style="color:var(--teal-dark)">All tasks estimated ✓</span>`}`;
+}
+
+// ============================================================
+// P4 — Urgent Block
+// ============================================================
+function renderP4() {
+  const tasks = S.tasks.filter(t => !t.wse);
+  const urgentCount = tasks.filter(t => t.priority === 'Urgent').length;
+
+  const rows = tasks.map(t => {
+    const on = t.priority === 'Urgent';
+    return `<div class="pri-row ${on ? 'is-urgent' : ''}">
+      <div class="pri-row-text">${esc(t.task)}</div>
+      ${t.minutes ? `<span class="pri-row-mins">${t.minutes}m</span>` : ''}
+      <button class="btn-mark-urgent ${on ? 'on' : ''}" onclick="toggleUrgent(${t.id})">
+        ${on ? '🔴 Urgent' : 'Mark Urgent'}
+      </button>
+    </div>`;
+  }).join('');
+
+  const lastWeekU = S.history.length > 0 ? S.history[S.history.length - 1] : null;
+  const urgentInsight = lastWeekU && lastWeekU.urgentRemaining > 0
+    ? `<div class="obs-box" style="margin-bottom:16px">Last week <strong>${lastWeekU.urgentRemaining}</strong> urgent task${lastWeekU.urgentRemaining !== 1 ? 's' : ''} carried over. Check whether any appear again before adding new ones.</div>`
+    : '';
+
+  return `
+    <div class="panel-title">Urgent Block</div>
+    <div class="panel-hint">From your task list, mark what MUST happen before next week.</div>
+    ${urgentInsight}
+    <div class="warn-banner warn-urgent">
+      <div class="warn-icon">⚠️</div>
+      <div>
+        <div class="warn-title">What is URGENT?</div>
+        <div class="warn-text">Urgent means this task <strong>has to be done</strong> before your next planning session. Not "important". Not "I'd like to". It has to happen. If more than a handful of tasks feel urgent, most of them aren't.</div>
+      </div>
+    </div>
+    <div class="card">
+      ${rows || '<div style="text-align:center;padding:32px;color:var(--grey-mid);font-style:italic">No tasks to prioritise.</div>'}
+      ${urgentCount > 0 ? `<div class="totals-row"><span><strong>${urgentCount}</strong> task${urgentCount!==1?'s':''} marked urgent</span></div>` : ''}
+    </div>
+    <div class="step-nav">
+      <button class="btn btn-ghost" onclick="prev()">← Estimate</button>
+      <button class="btn btn-primary" onclick="next()">Next: High Block →</button>
+    </div>`;
+}
+
+function toggleUrgent(id) {
+  const t = S.tasks.find(t => t.id === id);
+  if (t) t.priority = (t.priority === 'Urgent') ? null : 'Urgent';
+  save(); rerender();
+}
+
+// ============================================================
+// P5 — High Block
+// ============================================================
+function renderP5() {
+  const tasks = S.tasks.filter(t => !t.wse && t.priority !== 'Urgent');
+  const highCount = tasks.filter(t => t.priority === 'High').length;
+
+  const rows = tasks.map(t => {
+    const on = t.priority === 'High';
+    return `<div class="pri-row ${on ? 'is-high' : ''}">
+      <div class="pri-row-text">${esc(t.task)}</div>
+      ${t.minutes ? `<span class="pri-row-mins">${t.minutes}m</span>` : ''}
+      <button class="btn-mark-high ${on ? 'on' : ''}" onclick="toggleHigh(${t.id})">
+        ${on ? '🟠 High' : 'Mark High'}
+      </button>
+    </div>`;
+  }).join('');
+
+  const urgentCount = S.tasks.filter(t => t.priority === 'Urgent').length;
+
+  return `
+    <div class="panel-title">High Block</div>
+    <div class="panel-hint">From the remaining tasks, mark what you'd like to get done this week.</div>
+    <div class="warn-banner warn-high">
+      <div class="warn-icon">💡</div>
+      <div>
+        <div class="warn-title">What is HIGH priority?</div>
+        <div class="warn-text">High means you would <strong>like</strong> to get this done this week if capacity allows. Be realistic — how many can you genuinely complete alongside your ${urgentCount} urgent task${urgentCount!==1?'s':''}? Everything not marked High or Urgent will be set to Parked.</div>
+      </div>
+    </div>
+    <div class="card">
+      ${tasks.length === 0
+        ? `<div style="text-align:center;padding:32px;color:var(--grey-mid);font-style:italic">All tasks are already marked urgent.</div>`
+        : rows}
+      ${highCount > 0 ? `<div class="totals-row"><span><strong>${highCount}</strong> task${highCount!==1?'s':''} marked high</span></div>` : ''}
+    </div>
+    <div class="step-nav">
+      <button class="btn btn-ghost" onclick="prev()">← Urgent Block</button>
+      <button class="btn btn-primary" onclick="applyDefaultsAndNext()">Next: Allocate →</button>
+    </div>`;
+}
+
+function toggleHigh(id) {
+  const t = S.tasks.find(t => t.id === id);
+  if (t) t.priority = (t.priority === 'High') ? null : 'High';
+  save(); rerender();
+}
+
+function applyDefaultsAndNext() {
+  S.tasks.forEach(t => { if (!t.priority) t.priority = 'Parked'; });
+  save(); go(6);
+}
+
+// ============================================================
+// P6 — Allocate
+// ============================================================
+function renderP6() {
+  const tasks = S.tasks.filter(t => !t.wse);
+
+  const groups = [
+    { label: 'Urgent', cls: 'badge-urgent', items: tasks.filter(t => t.priority === 'Urgent') },
+    { label: 'High', cls: 'badge-high', items: tasks.filter(t => t.priority === 'High') },
+    { label: 'Parked', cls: 'badge-parked', items: tasks.filter(t => t.priority === 'Parked') }
+  ].filter(g => g.items.length > 0);
+
+  function mkDayOpts(t) {
+    let opts = `<option value="" ${!t.dayBlock?'selected':''}>Day…</option>`;
+    ALL_DAYS.forEach(d => {
+      const label = d === TTR ? 'Things to Remember' : d;
+      opts += `<option value="${d}" ${t.dayBlock===d?'selected':''}>${label}</option>`;
+    });
+    return opts;
+  }
+
+  let rows = '';
+  groups.forEach(g => {
+    rows += `<div class="card-title" style="background:var(--grey-light)">${g.label} <span style="font-weight:400;opacity:.6">(${g.items.length})</span></div>`;
+    g.items.forEach(t => {
+      const needsDay = t.priority !== 'Parked';
+      rows += `<div class="alloc-row">
+        <div class="alloc-task" title="${esc(t.task)}">${esc(t.task)}</div>
+        ${t.minutes ? `<span class="alloc-mins">${t.minutes}m</span>` : ''}
+        ${needsDay
+          ? `<select class="day-select" onchange="setDay(${t.id},this.value)">${mkDayOpts(t)}</select>`
+          : `<span style="font-size:12px;color:var(--grey-mid)">→ Things to Remember</span>`}
+      </div>`;
+    });
+  });
+
+  // ---- Capacity inputs ----
+  const mfCells = DAYS.map(d => `
+    <div class="mf-cell">
+      <div class="mf-day-lbl">${d.slice(0,3)}</div>
+      <input class="mf-input" type="number" min="0" step="30" placeholder="0"
+        value="${S.mf[d]||''}" onchange="setMf('${d}',this.value)" />
+    </div>`).join('');
+
+  const cap = totalCapacity();
+  const committed = committedMins();
+  const ratio = cap > 0 && committed > 0 ? committed / cap : 0;
+  const delta = committed - cap;
+  let ratioClass = 'ok', obsClass = '';
+  if (ratio > 1.8) { ratioClass = 'over'; obsClass = 'over'; }
+  else if (ratio > 1.1) { ratioClass = 'warn'; obsClass = 'warn'; }
+
+  const lastWeekA = S.history.length > 0 ? S.history[S.history.length - 1] : null;
+  const lastWeekRatio = lastWeekA && lastWeekA.capacity > 0 ? lastWeekA.planned / lastWeekA.capacity : 0;
+  const historyNote = lastWeekA && lastWeekA.capacity > 0
+    ? ` Last week your plan was <strong>${lastWeekRatio.toFixed(1)}x</strong> your capacity${lastWeekA.carryOverTasks > 0 ? ` — ${lastWeekA.carryOverTasks} task${lastWeekA.carryOverTasks !== 1 ? 's' : ''} carried over` : ''}.`
+    : '';
+
+  const realityHtml = cap > 0 ? `
+    <div class="reality-strip">
+      <div class="reality-card">
+        <div class="reality-lbl">Urgent + High Work</div>
+        <div class="reality-val">${committed}<span style="font-size:13px;font-weight:400;color:var(--grey-mid)"> min</span></div>
+        <div class="reality-sub">${fmtMins(committed)||'—'} to commit this week</div>
+      </div>
+      <div class="reality-card">
+        <div class="reality-lbl">Available Capacity</div>
+        <div class="reality-val ok">${cap}<span style="font-size:13px;font-weight:400;color:var(--grey-mid)"> min</span></div>
+        <div class="reality-sub">${fmtMins(cap)||'—'} of usable time</div>
+      </div>
+      <div class="reality-card">
+        <div class="reality-lbl">${delta >= 0 ? 'Overcommitted' : 'Capacity Remaining'}</div>
+        <div class="reality-val ${delta > 0 ? 'over' : 'ok'}">${Math.abs(delta)}<span style="font-size:13px;font-weight:400;color:var(--grey-mid)"> min</span></div>
+        <div class="reality-sub">${fmtMins(Math.abs(delta))||'—'}</div>
+      </div>
+      <div class="reality-card">
+        <div class="reality-lbl">Commitment Ratio</div>
+        <div class="reality-val ${ratioClass}">${committed > 0 ? ratio.toFixed(2) : '—'}<span style="font-size:13px;font-weight:400;color:var(--grey-mid)">${committed > 0 ? 'x' : ''}</span></div>
+        <div class="reality-sub">${ratio > 0 ? (ratio >= 1 ? Math.round((ratio-1)*100)+'% over capacity' : Math.round((1-ratio)*100)+'% under capacity') : 'no estimates yet'}</div>
+      </div>
+    </div>
+    <div class="obs-box ${obsClass}">${getRoadmapObs(ratio, cap, committed)}${historyNote}</div>` : '';
+
+  return `
+    <div class="panel-title">Allocate</div>
+    <div class="panel-hint">First, enter your available time this week. Then assign tasks to days.</div>
+    <div class="card" style="margin-bottom:0">
+      <div class="card-title" style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+        <div>
+          <div>Meeting-free minutes per day</div>
+          <div style="font-size:11px;font-weight:400;text-transform:none;letter-spacing:0;color:var(--grey-mid);margin-top:3px">How much time is not blocked by meetings? We halve this to account for interruptions, admin, and the unexpected.</div>
+        </div>
+        <span style="font-size:11px;font-weight:400;text-transform:none;letter-spacing:0;color:var(--grey-mid);white-space:nowrap;padding-top:2px">Usable = 50%</span>
+      </div>
+      <div style="padding:14px 16px 16px"><div class="mf-grid">${mfCells}</div></div>
+    </div>
+    ${realityHtml}
+    <div class="card" style="margin-top:4px">${rows || '<div style="text-align:center;padding:32px;color:var(--grey-mid);font-style:italic">No tasks to allocate.</div>'}</div>
+    ${mkDayCapStrip()}
+    <div class="step-nav">
+      <button class="btn btn-ghost" onclick="prev()">← High Block</button>
+      <button class="btn btn-primary" onclick="applyDayDefaultsAndNext()">Next: Roadmap →</button>
+    </div>`;
+}
+
+function mkDayCapStrip() {
+  const chips = DAYS.map(d => {
+    const cap = dayCapacity(d);
+    if (cap === 0) return '';
+    const used = dayUsed(d);
+    const pct = Math.min(100, Math.round(used / cap * 100));
+    const over = used > cap;
+    const warn = !over && pct >= 80;
+    const fillCol = over ? 'var(--red)' : warn ? 'var(--orange)' : 'var(--teal-dark)';
+    const textCol = over ? 'var(--red)' : warn ? 'var(--orange)' : 'var(--grey-mid)';
+    return `<div class="day-chip">
+      <div class="day-chip-name">${d.slice(0,3)}</div>
+      <div class="day-chip-bar"><div class="day-chip-fill" style="width:${pct}%;background:${fillCol}"></div></div>
+      <div class="day-chip-nums" style="color:${textCol}">${used}/${cap} min${over ? ' ⚠' : ''}</div>
+    </div>`;
+  }).filter(Boolean).join('');
+  if (!chips) return '';
+  return `<div style="margin-top:12px">
+    <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--grey-mid);margin-bottom:8px">Daily capacity</div>
+    <div class="day-strip">${chips}</div>
+  </div>`;
+}
+
+function setDay(id, d) {
+  const t = S.tasks.find(t => t.id === id);
+  if (t) { t.dayBlock = d || null; save(); }
+  rerender();
+}
+
+function applyDayDefaultsAndNext() {
+  S.tasks.forEach(t => { if (t.priority === 'Parked' && !t.dayBlock) t.dayBlock = TTR; });
+  save(); go(7);
+}
+
+// ============================================================
+// P7 — Roadmap
+// ============================================================
+function renderP7() {
+  // ---- Day cards ----
+  const active = S.tasks.filter(t => !t.wse && t.priority !== 'Parked');
+
+  function taskCard(t) {
+    const dot = t.priority === 'Urgent' ? `<div class="pri-dot urgent"></div>` : `<div class="pri-dot high"></div>`;
+    return `<div class="day-task">
+      ${dot}
+      <div class="day-task-text">${esc(t.task)}</div>
+      <div class="day-task-right">
+        ${t.minutes ? `<span class="day-task-mins">${t.minutes}m</span>` : ''}
+        <div class="day-task-btns">
+          <button class="btn-done" onclick="markDone(${t.id})">Done</button>
+          <button class="btn-wse" onclick="toggleWse(${t.id})">With someone</button>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  const isWeekend = d => d === 'Saturday' || d === 'Sunday';
+
+  const cards = ALL_DAYS.map(day => {
+    const isTTR = day === TTR;
+    const dt = isTTR
+      ? active.filter(t => t.dayBlock === TTR || (!t.dayBlock && (t.priority === 'Urgent' || t.priority === 'High')))
+      : active.filter(t => t.dayBlock === day);
+
+    if (dt.length === 0 && isTTR) return '';
+    if (dt.length === 0 && isWeekend(day) && dayCapacity(day) === 0) return '';
+
+    const used = isTTR ? 0 : dayUsed(day);
+    const dayCap = isTTR ? 0 : dayCapacity(day);
+    const pct = dayCap > 0 ? Math.min(100, Math.round(used / dayCap * 100)) : 0;
+    const over = dayCap > 0 && used > dayCap;
+
+    return `<div class="day-card">
+      <div class="day-card-head">
+        <span class="day-card-name">${day}</span>
+        ${dayCap > 0 ? `<span class="day-card-cap">${used}/${dayCap} min${over?' ⚠':''}</span>` : ''}
+      </div>
+      ${dayCap > 0 ? `<div class="cap-bar"><div class="cap-fill ${over?'over':''}" style="width:${pct}%"></div></div>` : ''}
+      ${dt.length === 0 ? `<div class="day-empty">Nothing allocated</div>` : dt.map(taskCard).join('')}
+    </div>`;
+  }).filter(Boolean).join('');
+
+  // ---- Parked pool ----
+  const parked = S.tasks.filter(t => !t.wse && t.priority === 'Parked');
+  const parkedHtml = parked.length ? `
+    <div class="pool-section">
+      <div class="pool-head">
+        <span class="pool-head-title">Parked — Not This Week</span>
+        <span class="pool-badge" style="background:var(--grey-mid)">${parked.length}</span>
+      </div>
+      ${parked.map(t => `<div class="pool-task">
+        <span class="pool-task-text">${esc(t.task)}</span>
+        ${t.minutes ? `<span style="font-size:12px;color:var(--grey-mid)">${t.minutes}m</span>` : ''}
+        <button class="btn-done" onclick="markDone(${t.id})">Done</button>
+      </div>`).join('')}
+    </div>` : '';
+
+  // ---- WSE pool ----
+  const wse = S.tasks.filter(t => t.wse);
+  const wseHtml = wse.length ? `
+    <div class="pool-section">
+      <div class="pool-head">
+        <span class="pool-head-title">With Someone Else</span>
+        <span class="pool-badge" style="background:var(--orange)">${wse.length}</span>
+      </div>
+      ${wse.map(t => `<div class="pool-task">
+        <span class="pool-task-text">${esc(t.task)}</span>
+        ${t.minutes ? `<span style="font-size:12px;color:var(--grey-mid)">${t.minutes}m</span>` : ''}
+        <button class="ibtn i-carry" onclick="toggleWse(${t.id})" style="white-space:nowrap">↩ Bring back</button>
+        <button class="btn-done" onclick="markDone(${t.id})">Done</button>
+      </div>`).join('')}
+    </div>` : '';
+
+  return `
+    <div class="panel-title">Roadmap</div>
+    <div class="panel-hint">Your week at a glance. Mark tasks done as you go.</div>
+    ${cards ? `<div class="day-cards">${cards}</div>` : `<div style="text-align:center;padding:40px;color:var(--grey-mid);font-size:14px;font-style:italic">No tasks allocated. Go back to Allocate to assign tasks to days.</div>`}
+    ${parkedHtml}${wseHtml}
+    <div class="new-week-bar">
+      <div class="new-week-hint">Save your plan — your data lives in this browser, so a saved file keeps it safe across devices and browser clears.</div>
+      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:12px">
+        <button class="btn btn-primary" onclick="saveAsFile()">Save as file</button>
+        <button class="btn btn-secondary" onclick="window.print()">Print</button>
+      </div>
+      <div style="font-size:12px;color:var(--grey-mid)">Next week, open the app here and your carry-overs will be waiting in Clarity.</div>
+    </div>
+    <div class="step-nav">
+      <button class="btn btn-ghost" onclick="prev()">← Allocate</button>
+      ${S.history.length > 0 ? `<button class="btn btn-secondary" onclick="go(8)">Review →</button>` : ''}
+    </div>`;
+}
+
+function getRoadmapObs(ratio, cap, committed) {
+  if (cap === 0) return "Enter your meeting-free time above to see your commitment vs capacity.";
+  if (committed === 0) return "No time estimates on your urgent or high tasks — add estimates in the Estimate step to see your reality.";
+  if (ratio < 0.6) return `Your committed work is ${Math.round(ratio*100)}% of your available capacity. Either you have significant time remaining, or some tasks are missing estimates.`;
+  if (ratio < 0.9) return "Your committed work is within capacity. Good position to execute from.";
+  if (ratio < 1.1) return "Your committed work is close to your available capacity. Manageable if no unexpected work arrives.";
+  if (ratio < 1.5) return `Your committed work is ${ratio.toFixed(1)}x your available capacity. Expect some carry-over unless lower-priority items slip.`;
+  if (ratio < 2.0) return `Your committed work is ${ratio.toFixed(1)}x your available capacity. Significant carry-over is likely without deliberate reallocation.`;
+  return `Your committed work is ${ratio.toFixed(1)}x your available capacity. This week's plan requires fundamental reallocation to be executable.`;
+}
+
+function setMf(day, v) { S.mf[day] = parseInt(v) || 0; save(); rerender(); }
+
+function markDone(id) { S.tasks = S.tasks.filter(t => t.id !== id); S.completedThisWeek++; save(); render(); }
+
+function toggleWse(id) {
+  const t = S.tasks.find(t => t.id === id);
+  if (t) { t.wse = !t.wse; if (t.wse) { t.priority = null; t.dayBlock = null; } }
+  save(); render();
+}
+
+// ============================================================
+// P8 — Review (week 2+ only)
+// ============================================================
+function renderP8() {
+  if (!S.history.length) return `
+    <div class="panel-title">Review</div>
+    <div class="panel-hint">Complete your first week to unlock your weekly review.</div>
+    <div class="step-nav"><button class="btn btn-ghost" onclick="prev()">← Roadmap</button></div>`;
+
+  const h = S.history[S.history.length - 1];
+  const compRate = h.totalTasks > 0 ? Math.round(h.completedTasks / h.totalTasks * 100) : 0;
+  const ratio = h.capacity > 0 ? (h.planned / h.capacity).toFixed(1) : '—';
+  const obs = getReviewObs(h, compRate);
+
+  return `
+    <div class="panel-title">Review</div>
+    <div class="panel-hint">What actually happened last week.</div>
+    <div class="review-grid">
+      <div class="review-card">
+        <div class="review-lbl">Completion Rate</div>
+        <div class="review-val">${compRate}<span style="font-size:14px;font-weight:400;color:var(--grey-mid)">%</span></div>
+        <div class="review-sub">${h.completedTasks} of ${h.totalTasks} tasks</div>
+      </div>
+      <div class="review-card">
+        <div class="review-lbl">Carry-over</div>
+        <div class="review-val">${h.carryOverTasks}</div>
+        <div class="review-sub">${fmtMins(h.carryOverMins)||'0 min'} of work</div>
+      </div>
+      <div class="review-card">
+        <div class="review-lbl">Urgent Remaining</div>
+        <div class="review-val">${h.urgentRemaining}</div>
+        <div class="review-sub">tasks not completed</div>
+      </div>
+      <div class="review-card">
+        <div class="review-lbl">Plan vs Capacity</div>
+        <div class="review-val">${ratio}<span style="font-size:14px;font-weight:400;color:var(--grey-mid)">${ratio!=='—'?'x':''}</span></div>
+        <div class="review-sub">${h.planned} min planned</div>
+      </div>
+    </div>
+    <div>${obs.map(o => `<div class="review-obs-item">${o}</div>`).join('')}</div>
+    <div class="step-nav" style="margin-top:28px">
+      <button class="btn btn-ghost" onclick="prev()">← Roadmap</button>
+      <button class="btn btn-primary" onclick="go(1)">Start new week →</button>
+    </div>`;
+}
+
+function getReviewObs(h, compRate) {
+  const obs = [];
+  const ratio = h.capacity > 0 ? h.planned / h.capacity : 0;
+
+  if (compRate >= 90) obs.push(`Strong execution — ${compRate}% of planned tasks completed. Your plan was realistic and you delivered against it.`);
+  else if (compRate >= 70) obs.push(`You completed ${compRate}% of planned tasks. Consider whether the carry-over was anticipated or arrived as a surprise.`);
+  else if (compRate >= 50) obs.push(`Your completion rate was ${compRate}%. Worth examining — was the plan unrealistic, or did unexpected work arrive mid-week?`);
+  else obs.push(`Your completion rate was ${compRate}%. Significant unexecuted work suggests the plan did not reflect the week's actual constraints.`);
+
+  if (h.carryOverTasks > 0) {
+    obs.push(`${h.carryOverTasks} task${h.carryOverTasks!==1?'s':''} carrying forward (${fmtMins(h.carryOverMins)||'unknown time'}). These have been reset for reprioritisation this week.`);
+  }
+  if (h.urgentRemaining > 0) {
+    obs.push(`${h.urgentRemaining} urgent task${h.urgentRemaining!==1?'s':''} from last week remained incomplete. Recurring urgent carry-over may indicate scope creep or sustained external pressure on your commitments.`);
+  }
+  if (ratio > 1.6 && compRate < 75) {
+    obs.push(`Your plan was ${ratio.toFixed(1)}x your available capacity. The overplan directly contributed to the carry-over. Consider what you would park earlier in your next planning cycle.`);
+  }
+
+  return obs;
+}
+
+// ============================================================
+// New week
+// ============================================================
+function startNewWeek() {
+  if (!confirm('Close this week and start the next?\n\nUnfinished tasks will carry forward for reprioritisation.')) return;
+
+  const carry = S.tasks.filter(t => !t.wse);
+  S.history.push({
+    weekEnded: new Date().toISOString().split('T')[0],
+    totalTasks: carry.length + S.completedThisWeek,
+    completedTasks: S.completedThisWeek,
+    carryOverTasks: carry.length,
+    carryOverMins: carry.reduce((s,t) => s + (t.minutes||0), 0),
+    urgentRemaining: S.tasks.filter(t => t.priority === 'Urgent').length,
+    planned: committedMins(),
+    capacity: totalCapacity()
+  });
+
+  S.tasks = S.tasks.map(t => ({
+    ...t, priority: null, dayBlock: null, carriedOver: true
+  }));
+
+  S.completedThisWeek = 0;
+  S.step = 1;
+  S.mf = { Monday:0, Tuesday:0, Wednesday:0, Thursday:0, Friday:0, Saturday:0, Sunday:0 };
+  editingId = null; notesOpen = new Set();
+
+  save(); render();
+}
+
+// ============================================================
+// Reset
+// ============================================================
+function confirmReset() {
+  if (!confirm('Start completely over? All tasks and history will be deleted.')) return;
+  localStorage.removeItem(KEY);
+  S = { step:1, tasks:[], nextId:1, mf:{Monday:0,Tuesday:0,Wednesday:0,Thursday:0,Friday:0,Saturday:0,Sunday:0}, completedThisWeek:0, history:[], lastSnapshotDate:null };
+  editingId = null; notesOpen = new Set(); sortDir = 'asc';
+  render();
+}
+
+// ---- Init ----
+initState();
+render();
+
+// ---- Service worker (PWA offline support) ----
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}
+</script>
+</body>
+</html>

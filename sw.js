@@ -1,4 +1,4 @@
-const CACHE = 'clearos-v1';
+const CACHE = 'clearos-v2';
 const ASSETS = [
   '/',
   '/index.html',

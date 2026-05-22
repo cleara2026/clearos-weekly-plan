@@ -1069,6 +1069,9 @@ function renderP6() {
   return `
     <div class="panel-title">Capacity</div>
     <div class="panel-hint">How many hours do you have available for focused work each day this week?</div>
+    <div style="margin-bottom:16px;text-align:right">
+      <button class="btn btn-secondary btn-sm" onclick="go(7)">Skip: go straight to Allocate</button>
+    </div>
     <div class="card" style="margin-bottom:20px">
       <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;gap:12px">
         <span>Hours available per day</span>
@@ -1079,10 +1082,7 @@ function renderP6() {
     ${revealHtml}
     <div class="step-nav">
       <button class="btn btn-ghost" onclick="prev()">← High Block</button>
-      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
-        <button class="btn btn-primary" onclick="go(7)">Plan my days →</button>
-        <button class="btn btn-ghost" style="font-size:12px;padding:4px 10px;opacity:0.6" onclick="go(7)">Skip capacity check →</button>
-      </div>
+      <button class="btn btn-primary" onclick="go(7)">Plan my days →</button>
     </div>`;
 }
 

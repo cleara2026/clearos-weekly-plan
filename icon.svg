@@ -1,5 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="80" fill="#007a78"/>
-  <text x="256" y="200" font-family="Arial,sans-serif" font-size="160" font-weight="900" fill="white" text-anchor="middle" dominant-baseline="middle">C</text>
-  <text x="256" y="360" font-family="Arial,sans-serif" font-size="72" font-weight="700" fill="rgba(255,255,255,0.85)" text-anchor="middle" dominant-baseline="middle">CLEAR OS</text>
+  <rect width="512" height="512" fill="#ffffff"/>
+  <text x="256" y="240" font-family="Arial Black,Arial,sans-serif" font-size="195" font-weight="900" fill="#000000" text-anchor="middle" dominant-baseline="middle">CLEAR</text>
+  <circle cx="56"  cy="390" r="44" fill="#652d90"/>
+  <circle cx="156" cy="390" r="44" fill="#009a98"/>
+  <circle cx="256" cy="390" r="44" fill="#edc530"/>
+  <circle cx="356" cy="390" r="44" fill="#f6931e"/>
+  <circle cx="456" cy="390" r="44" fill="#eb1c24"/>
 </svg>

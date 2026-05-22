@@ -742,14 +742,10 @@ function renderP2() {
             </div>${notesBlock}
           </div>`;
         }
-        const badges = (t.priority || t.minutes) ? `<span class="task-badges">
-          ${t.priority ? `<span class="badge badge-${t.priority.toLowerCase()}">${t.priority}</span>` : ''}
-          ${t.minutes ? `<span class="badge badge-mins">${fmtMins(t.minutes)}</span>` : ''}
-        </span>` : '';
         return `<div data-id="${t.id}">
           <div class="task-row">
             ${dragHandle}
-            <div class="task-text">${esc(t.task)}${badges}</div>
+            <div class="task-text">${esc(t.task)}</div>
             ${actions}
           </div>${notesBlock}
         </div>`;

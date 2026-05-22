@@ -199,6 +199,10 @@ main { max-width: 1400px; margin: 0 auto; padding: 32px 40px 80px; }
 .adv-select { font-family: var(--font-body); font-size: 13px; padding: 7px 10px; border: 1px solid var(--grey-border); border-radius: 6px; background: var(--white); color: var(--grey-dark); cursor: pointer; height: 38px; }
 .adv-mins-input { font-family: var(--font-body); font-size: 13px; padding: 7px 8px; border: 1px solid var(--grey-border); border-radius: 6px; width: 80px; height: 38px; text-align: center; color: var(--grey-dark); }
 .adv-mins-input:focus, .adv-select:focus { outline: none; border-color: var(--teal-dark); }
+.row-adv-select { font-family: var(--font-body); font-size: 12px; padding: 4px 6px; border: 1px solid var(--grey-border); border-radius: 6px; background: var(--white); color: var(--grey-dark); cursor: pointer; height: 30px; flex-shrink: 0; }
+.row-adv-mins { font-family: var(--font-body); font-size: 12px; padding: 4px 6px; border: 1px solid var(--grey-border); border-radius: 6px; width: 64px; height: 30px; text-align: center; color: var(--grey-dark); flex-shrink: 0; }
+.row-adv-select:focus, .row-adv-mins:focus { outline: none; border-color: var(--teal-dark); }
+.task-badges { display: inline-flex; gap: 4px; margin-left: 8px; flex-wrap: wrap; align-items: center; }
 .delta-callout { border-radius: 8px; padding: 11px 14px; font-size: 13px; color: var(--grey-dark); line-height: 1.5; border: 1px solid #fdd8a8; background: #fff8f0; margin-bottom: 12px; }
 .delta-callout strong { color: var(--orange); }
 
@@ -716,15 +720,37 @@ function renderP2() {
             <textarea class="notes-area" placeholder="Add a note…"
               onchange="saveNotes(${t.id},this.value)">${esc(t.notes||'')}</textarea>
           </div>` : '';
-        return `<div data-id="${t.id}">
-          <div class="task-row">
-            <span class="drag-handle" title="Drag to reorder"><svg width="10" height="14" viewBox="0 0 10 14" fill="none"><circle cx="3" cy="2.5" r="1.5" fill="currentColor"/><circle cx="7" cy="2.5" r="1.5" fill="currentColor"/><circle cx="3" cy="7" r="1.5" fill="currentColor"/><circle cx="7" cy="7" r="1.5" fill="currentColor"/><circle cx="3" cy="11.5" r="1.5" fill="currentColor"/><circle cx="7" cy="11.5" r="1.5" fill="currentColor"/></svg></span>
-            <div class="task-text">${esc(t.task)}</div>
-            <div class="task-actions">
+        const dragHandle = `<span class="drag-handle" title="Drag to reorder"><svg width="10" height="14" viewBox="0 0 10 14" fill="none"><circle cx="3" cy="2.5" r="1.5" fill="currentColor"/><circle cx="7" cy="2.5" r="1.5" fill="currentColor"/><circle cx="3" cy="7" r="1.5" fill="currentColor"/><circle cx="7" cy="7" r="1.5" fill="currentColor"/><circle cx="3" cy="11.5" r="1.5" fill="currentColor"/><circle cx="7" cy="11.5" r="1.5" fill="currentColor"/></svg></span>`;
+        const actions = `<div class="task-actions">
               <button class="btn btn-sm btn-secondary" onclick="toggleNotes(${t.id})" title="Notes">${notesOpen.has(t.id)?'▲':'📝'}</button>
               <button class="btn btn-sm btn-secondary" onclick="startEdit(${t.id})">Edit</button>
               <button class="btn btn-sm btn-danger" onclick="delTask(${t.id})">✕</button>
-            </div>
+            </div>`;
+        if (advancedInput) {
+          return `<div data-id="${t.id}">
+            <div class="task-row">
+              ${dragHandle}
+              <div class="task-text" style="flex:1 1 0;min-width:0">${esc(t.task)}</div>
+              <select class="row-adv-select" onchange="setTaskField(${t.id},'priority',this.value)">
+                <option value="" ${!t.priority?'selected':''}>Priority</option>
+                <option value="Urgent" ${t.priority==='Urgent'?'selected':''}>🔴 Urgent</option>
+                <option value="High" ${t.priority==='High'?'selected':''}>🟠 High</option>
+              </select>
+              <input class="row-adv-mins" type="number" inputmode="numeric" min="0" step="5" placeholder="mins"
+                value="${t.minutes||''}" onchange="setTaskField(${t.id},'minutes',parseInt(this.value)||null)" />
+              ${actions}
+            </div>${notesBlock}
+          </div>`;
+        }
+        const badges = (t.priority || t.minutes) ? `<span class="task-badges">
+          ${t.priority ? `<span class="badge badge-${t.priority.toLowerCase()}">${t.priority}</span>` : ''}
+          ${t.minutes ? `<span class="badge badge-mins">${fmtMins(t.minutes)}</span>` : ''}
+        </span>` : '';
+        return `<div data-id="${t.id}">
+          <div class="task-row">
+            ${dragHandle}
+            <div class="task-text">${esc(t.task)}${badges}</div>
+            ${actions}
           </div>${notesBlock}
         </div>`;
       }).join('');
@@ -791,6 +817,10 @@ function addFromInput() {
 }
 
 function toggleAdvanced() { advancedInput = !advancedInput; rerender(); }
+function setTaskField(id, field, value) {
+  const t = S.tasks.find(t => t.id === id);
+  if (t) { t[field] = value || null; save(); }
+}
 
 function addTask(text, priority = null, minutes = null) {
   S.tasks.push({ id: S.nextId++, task: text, notes: '', minutes: minutes, priority: priority, dayBlock: null, wse: false, carriedOver: false });

@@ -195,6 +195,10 @@ main { max-width: 1400px; margin: 0 auto; padding: 32px 40px 80px; }
 .cap-warn { background: #fff8f0; border: 1px solid #fdd8a8; color: #b45309; }
 .cap-over { background: #fff0f0; border: 1px solid #ffc8c8; color: var(--red); }
 .cap-neutral { background: var(--grey-light); border: 1px solid var(--grey-border); color: var(--grey-mid); }
+.step-indicator { display: none; font-size: 12px; font-weight: 600; color: var(--grey-mid); padding: 0 0 6px; letter-spacing: 0.02em; }
+.adv-select { font-family: var(--font-body); font-size: 13px; padding: 7px 10px; border: 1px solid var(--grey-border); border-radius: 6px; background: var(--white); color: var(--grey-dark); cursor: pointer; height: 38px; }
+.adv-mins-input { font-family: var(--font-body); font-size: 13px; padding: 7px 8px; border: 1px solid var(--grey-border); border-radius: 6px; width: 80px; height: 38px; text-align: center; color: var(--grey-dark); }
+.adv-mins-input:focus, .adv-select:focus { outline: none; border-color: var(--teal-dark); }
 .delta-callout { border-radius: 8px; padding: 11px 14px; font-size: 13px; color: var(--grey-dark); line-height: 1.5; border: 1px solid #fdd8a8; background: #fff8f0; margin-bottom: 12px; }
 .delta-callout strong { color: var(--orange); }
 
@@ -262,12 +266,7 @@ details.pool-section[open] .pool-chevron { transform: rotate(180deg); }
 .pool-task-text { flex: 1; color: var(--black); }
 
 /* ---- Review ---- */
-.review-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
-.review-card { background: var(--white); border: 1px solid var(--grey-border); border-radius: 10px; padding: 16px 18px; }
-.review-lbl { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--grey-mid); margin-bottom: 6px; }
-.review-val { font-family: var(--font-display); font-size: 28px; font-weight: 700; color: var(--black); line-height: 1; }
-.review-sub { font-size: 11px; color: var(--grey-mid); margin-top: 3px; }
-.review-obs-item { background: var(--white); border: 1px solid var(--grey-border); border-left: 3px solid var(--teal-dark); border-radius: 8px; padding: 12px 16px; font-size: 14px; color: var(--grey-dark); line-height: 1.55; margin-bottom: 10px; }
+
 
 
 /* Allocate parked collapsed group */
@@ -300,12 +299,26 @@ details.pool-section[open] .pool-chevron { transform: rotate(180deg); }
 }
 
 @media (max-width: 640px) {
+  .step-indicator { display: block; }
+  .steps { -webkit-overflow-scrolling: touch; }
+  .step-btn { padding: 5px 8px; font-size: 11px; gap: 5px; }
+  .step-divider { width: 10px; }
   .reality-strip { grid-template-columns: 1fr 1fr; }
-  .review-grid { grid-template-columns: 1fr 1fr; }
   .mf-grid { grid-template-columns: repeat(4, 1fr); }
   .header-inner { padding: 12px 16px 10px; }
   main { padding: 16px 14px 60px; }
   .day-cards { grid-template-columns: 1fr; }
+  .panel-title { font-size: 22px; }
+  .ibtn, .btn { min-height: 40px; }
+  .btn-sm { min-height: 36px; }
+  .add-row-adv { flex-wrap: wrap; gap: 6px; }
+  .add-row-adv .add-input { flex: 1 1 100%; }
+  .add-row-adv .adv-select { flex: 1 1 auto; }
+  .add-row-adv .adv-mins-input { width: 70px; }
+  .alloc-row { flex-wrap: wrap; gap: 6px; }
+  .day-select { width: 100%; }
+  .reality-card { padding: 12px 14px; }
+  .mf-input { font-size: 16px; }
 }
 </style>
 </head>
@@ -323,6 +336,7 @@ details.pool-section[open] .pool-chevron { transform: rotate(180deg); }
         <button class="btn-hdr btn-hdr-reset" onclick="confirmReset()">Start over</button>
       </div>
     </div>
+    <div class="step-indicator" id="step-indicator"></div>
     <div class="steps" id="steps"></div>
   </div>
 </header>
@@ -551,7 +565,7 @@ function dayCapacity(day) { return Math.floor((S.mf[day]||0) / 2); }
 // ---- Render ----
 function render() {
   renderSteps();
-  const fns = [null, renderP1, renderP2, renderP3, renderP4, renderP5, renderP6, renderP7, renderP8, renderP9];
+  const fns = [null, renderP1, renderP2, renderP3, renderP4, renderP5, renderP6, renderP7, renderP8];
   document.getElementById('main').innerHTML = fns[S.step]();
   afterRender(true);
 }
@@ -569,6 +583,8 @@ function renderSteps() {
     if (i < n) h += '<div class="step-divider"></div>';
   }
   document.getElementById('steps').innerHTML = h;
+  const ind = document.getElementById('step-indicator');
+  if (ind) ind.textContent = `Step ${S.step} of ${n}: ${STEP_NAMES[S.step - 1]}`;
 }
 
 function afterRender(fullRender) {
@@ -577,7 +593,7 @@ function afterRender(fullRender) {
 }
 
 function rerender() {
-  const fns = [null, renderP1, renderP2, renderP3, renderP4, renderP5, renderP6, renderP7, renderP8, renderP9];
+  const fns = [null, renderP1, renderP2, renderP3, renderP4, renderP5, renderP6, renderP7, renderP8];
   document.getElementById('main').innerHTML = fns[S.step]();
   afterRender(false);
 }
@@ -716,15 +732,25 @@ function renderP2() {
 
   const sortLbl = sortDir === 'asc' ? 'A→Z' : 'Z→A';
 
+  const advHtml = advancedInput ? `
+      <select class="adv-select" id="advPriority">
+        <option value="">Priority</option>
+        <option value="Urgent">🔴 Urgent</option>
+        <option value="High">🟠 High</option>
+      </select>
+      <input class="adv-mins-input" id="advMins" type="number" inputmode="numeric" min="0" step="5" placeholder="mins" />` : '';
+
   return `
     <div class="panel-title">List</div>
     <div class="panel-hint">Get everything out of your head. Press Enter to add, or paste multiple lines at once.</div>
     <div class="card">
-      <div class="add-row">
+      <div class="add-row${advancedInput ? ' add-row-adv' : ''}">
         <input class="add-input" id="addInput" type="text"
-          placeholder="Add a task (press Enter, or paste a list)"
+          placeholder="${advancedInput ? 'Task name' : 'Add a task (press Enter, or paste a list)'}"
           onkeydown="addKey(event)" onpaste="pasteHandler(event)" />
+        ${advHtml}
         <button class="btn btn-primary" onclick="addFromInput()">Add</button>
+        <button class="btn btn-sm btn-secondary" onclick="toggleAdvanced()" title="${advancedInput ? 'Back to simple input' : 'Add priority and time estimate while capturing'}">${advancedInput ? 'Simple' : 'Advanced'}</button>
         ${tasks.length > 1 ? `<button class="btn btn-sm btn-secondary" onclick="toggleSort()">${sortLbl}</button>` : ''}
       </div>
       <div id="taskList">${rows}</div>
@@ -752,13 +778,23 @@ function addFromInput() {
   if (!el) return;
   const val = el.value.trim();
   if (!val) return;
-  val.split(/\r?\n/).map(l => l.trim()).filter(Boolean).forEach(addTask);
+  if (advancedInput) {
+    const priority = document.getElementById('advPriority')?.value || null;
+    const mins = parseInt(document.getElementById('advMins')?.value) || null;
+    val.split(/\r?\n/).map(l => l.trim()).filter(Boolean).forEach(t => addTask(t, priority, mins));
+    const p = document.getElementById('advPriority'); if (p) p.value = '';
+    const m = document.getElementById('advMins'); if (m) m.value = '';
+  } else {
+    val.split(/\r?\n/).map(l => l.trim()).filter(Boolean).forEach(t => addTask(t));
+  }
   el.value = ''; save(); rerender();
   document.getElementById('addInput')?.focus();
 }
 
-function addTask(text) {
-  S.tasks.push({ id: S.nextId++, task: text, notes: '', minutes: null, priority: null, dayBlock: null, wse: false, carriedOver: false });
+function toggleAdvanced() { advancedInput = !advancedInput; rerender(); }
+
+function addTask(text, priority = null, minutes = null) {
+  S.tasks.push({ id: S.nextId++, task: text, notes: '', minutes: minutes, priority: priority, dayBlock: null, wse: false, carriedOver: false });
 }
 
 function delTask(id) { S.tasks = S.tasks.filter(t => t.id !== id); notesOpen.delete(id); save(); rerender(); }
@@ -803,7 +839,7 @@ function renderP3() {
     <div class="est-row">
       <span class="est-task">${esc(t.task)}</span>
       <input class="est-input" type="number" min="0" step="5" tabindex="${i+1}"
-        placeholder="0" value="${t.minutes||''}" id="est_${t.id}"
+        placeholder="0" inputmode="numeric" value="${t.minutes||''}" id="est_${t.id}"
         onchange="setMinutes(${t.id},this.value)" />
       <span class="est-unit">min</span>
     </div>`).join('');
@@ -1027,7 +1063,7 @@ function renderP6() {
     return `<div class="mf-cell">
       <div class="mf-day-lbl">${d.slice(0,3)}</div>
       <input class="mf-input" type="number" min="0" max="16" step="0.5" placeholder="0"
-        value="${hrs}" onchange="setHours('${d}',this.value)" />
+        value="${hrs}" inputmode="decimal" onchange="setHours('${d}',this.value)" />
     </div>`;
   }).join('');
 
@@ -1344,73 +1380,6 @@ function toggleWse(id) {
   save(); render();
 }
 
-// ============================================================
-// P9 — Review (week 2+ only)
-// ============================================================
-function renderP9() {
-  if (!S.history.length) return `
-    <div class="panel-title">Review</div>
-    <div class="panel-hint">Complete your first week to unlock your weekly review.</div>
-    <div class="step-nav"><button class="btn btn-ghost" onclick="prev()">← Roadmap</button></div>`;
-
-  const h = S.history[S.history.length - 1];
-  const compRate = h.totalTasks > 0 ? Math.round(h.completedTasks / h.totalTasks * 100) : 0;
-  const ratio = h.capacity > 0 ? (h.planned / h.capacity).toFixed(1) : '-';
-  const obs = getReviewObs(h, compRate);
-
-  return `
-    <div class="panel-title">Review</div>
-    <div class="panel-hint">What actually happened last week.</div>
-    <div class="review-grid">
-      <div class="review-card">
-        <div class="review-lbl">Completion Rate</div>
-        <div class="review-val">${compRate}<span style="font-size:14px;font-weight:400;color:var(--grey-mid)">%</span></div>
-        <div class="review-sub">${h.completedTasks} of ${h.totalTasks} tasks</div>
-      </div>
-      <div class="review-card">
-        <div class="review-lbl">Carry-over</div>
-        <div class="review-val">${h.carryOverTasks}</div>
-        <div class="review-sub">${fmtMins(h.carryOverMins)||'0 min'} of work</div>
-      </div>
-      <div class="review-card">
-        <div class="review-lbl">Urgent Remaining</div>
-        <div class="review-val">${h.urgentRemaining}</div>
-        <div class="review-sub">tasks not completed</div>
-      </div>
-      <div class="review-card">
-        <div class="review-lbl">Plan vs Capacity</div>
-        <div class="review-val">${ratio}<span style="font-size:14px;font-weight:400;color:var(--grey-mid)">${ratio!=='-'?'x':''}</span></div>
-        <div class="review-sub">${h.planned} min planned</div>
-      </div>
-    </div>
-    <div>${obs.map(o => `<div class="review-obs-item">${o}</div>`).join('')}</div>
-    <div class="step-nav" style="margin-top:28px">
-      <button class="btn btn-ghost" onclick="prev()">← Roadmap</button>
-      <button class="btn btn-primary" onclick="go(1)">Start new week →</button>
-    </div>`;
-}
-
-function getReviewObs(h, compRate) {
-  const obs = [];
-  const ratio = h.capacity > 0 ? h.planned / h.capacity : 0;
-
-  if (compRate >= 90) obs.push(`Strong execution. ${compRate}% of planned tasks completed. Your plan was realistic and you delivered against it.`);
-  else if (compRate >= 70) obs.push(`You completed ${compRate}% of planned tasks. Consider whether the carry-over was anticipated or arrived as a surprise.`);
-  else if (compRate >= 50) obs.push(`Your completion rate was ${compRate}%. Worth examining. Was the plan unrealistic, or did unexpected work arrive mid-week?`);
-  else obs.push(`Your completion rate was ${compRate}%. Significant unexecuted work suggests the plan did not reflect the week's actual constraints.`);
-
-  if (h.carryOverTasks > 0) {
-    obs.push(`${h.carryOverTasks} task${h.carryOverTasks!==1?'s':''} carrying forward (${fmtMins(h.carryOverMins)||'unknown time'}). These have been reset for reprioritisation this week.`);
-  }
-  if (h.urgentRemaining > 0) {
-    obs.push(`${h.urgentRemaining} urgent task${h.urgentRemaining!==1?'s':''} from last week remained incomplete. Recurring urgent carry-over may indicate scope creep or sustained external pressure on your commitments.`);
-  }
-  if (ratio > 1.6 && compRate < 75) {
-    obs.push(`Your plan was ${ratio.toFixed(1)}x your available capacity. The overplan directly contributed to the carry-over. Consider what you would park earlier in your next planning cycle.`);
-  }
-
-  return obs;
-}
 
 // ============================================================
 // New week

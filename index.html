@@ -198,32 +198,39 @@ main { max-width: 1400px; margin: 0 auto; padding: 32px 40px 80px; }
 .day-chip-nums { font-size: 11px; color: var(--grey-mid); }
 
 /* ---- Day cards (Roadmap) ---- */
-.day-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-.day-card { background: var(--white); border: 1px solid var(--grey-border); border-radius: 10px; overflow: hidden; }
-.day-card-head { padding: 9px 13px; background: var(--grey-light); border-bottom: 1px solid var(--grey-border); display: flex; justify-content: space-between; align-items: center; }
-.day-card-name { font-family: var(--font-display); font-size: 13px; font-weight: 700; color: var(--black); }
-.day-card-cap { font-size: 11px; color: var(--grey-mid); }
-.cap-bar { height: 3px; background: var(--grey-border); }
-.cap-fill { height: 3px; background: var(--teal-dark); }
+.day-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.day-card { background: var(--white); border: 1px solid var(--grey-border); border-radius: 12px; overflow: hidden; box-shadow: 0 2px 16px rgba(0,0,0,0.06); transition: box-shadow .15s; }
+.day-card:hover { box-shadow: 0 4px 24px rgba(0,0,0,0.1); }
+.day-card-head { padding: 16px 18px 12px; background: var(--white); border-bottom: 1px solid var(--grey-border); display: flex; justify-content: space-between; align-items: flex-start; }
+.day-card-name { font-family: var(--font-display); font-size: 20px; font-weight: 800; color: var(--black); letter-spacing: -0.3px; }
+.day-card-cap { font-size: 12px; color: var(--grey-mid); margin-top: 2px; }
+.cap-bar { height: 4px; background: var(--grey-border); }
+.cap-fill { height: 4px; background: var(--teal-dark); transition: width .3s; }
 .cap-fill.over { background: var(--red); }
-.day-task { display: flex; align-items: flex-start; gap: 6px; padding: 8px 12px; border-bottom: 1px solid var(--grey-border); }
+.cap-fill.warn { background: var(--orange); }
+.day-task { display: flex; align-items: flex-start; gap: 10px; padding: 13px 18px; border-bottom: 1px solid var(--grey-border); }
 .day-task:last-child { border-bottom: none; }
-.pri-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+.pri-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
 .pri-dot.urgent { background: var(--red); }
 .pri-dot.high { background: var(--orange); }
-.day-task-text { flex: 1; font-size: 13px; color: var(--black); line-height: 1.35; word-break: break-word; min-width: 0; }
-.day-task-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
-.day-task-mins { font-size: 11px; color: var(--grey-mid); }
-.day-task-btns { display: flex; gap: 3px; }
-.btn-done { background: #f0fff4; color: #1a7a40; border: 1px solid #b8e8c8; font-size: 11px; padding: 3px 8px; border-radius: 5px; cursor: pointer; font-family: var(--font-body); }
+.day-task-text { flex: 1; font-size: 14px; color: var(--black); line-height: 1.4; word-break: break-word; min-width: 0; }
+.day-task-right { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex-shrink: 0; }
+.day-task-mins { font-size: 12px; color: var(--grey-mid); font-weight: 500; }
+.day-task-btns { display: flex; gap: 4px; }
+.btn-done { background: #f0fff4; color: #1a7a40; border: 1px solid #b8e8c8; font-size: 12px; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-family: var(--font-body); font-weight: 500; }
 .btn-done:hover { background: #dcfaea; }
-.btn-wse { background: #fff8f0; color: var(--orange); border: 1px solid #fde0b8; font-size: 11px; padding: 3px 8px; border-radius: 5px; cursor: pointer; font-family: var(--font-body); white-space: nowrap; }
+.btn-wse { background: #fff8f0; color: var(--orange); border: 1px solid #fde0b8; font-size: 12px; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-family: var(--font-body); white-space: nowrap; font-weight: 500; }
 .btn-wse:hover { background: #feeedd; }
-.day-empty { padding: 14px 12px; font-size: 13px; color: var(--grey-mid); font-style: italic; }
+.day-empty { padding: 18px; font-size: 13px; color: var(--grey-mid); font-style: italic; }
 
 /* ---- Pool sections (TTR / Parked / WSE) ---- */
 .pool-section { background: var(--white); border: 1px solid var(--grey-border); border-radius: 10px; overflow: hidden; margin-top: 12px; }
 .pool-head { padding: 10px 14px; background: var(--grey-light); border-bottom: 1px solid var(--grey-border); display: flex; align-items: center; justify-content: space-between; }
+details.pool-section > summary { list-style: none; }
+details.pool-section > summary::-webkit-details-marker { display: none; }
+details.pool-section:not([open]) > summary { border-bottom: none; }
+.pool-chevron { font-size: 13px; color: var(--grey-mid); transition: transform .2s; }
+details.pool-section[open] .pool-chevron { transform: rotate(180deg); }
 .pool-head-title { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--grey-dark); }
 .pool-badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; color: var(--white); }
 .pool-task { display: flex; align-items: center; gap: 8px; padding: 9px 14px; border-bottom: 1px solid var(--grey-border); font-size: 13px; }
@@ -1014,12 +1021,16 @@ function renderP7() {
     const pct = dayCap > 0 ? Math.min(100, Math.round(used / dayCap * 100)) : 0;
     const over = dayCap > 0 && used > dayCap;
 
-    return `<div class="day-card">
+    const accentCol = over ? 'var(--red)' : (pct >= 80 ? 'var(--orange)' : 'var(--teal-dark)');
+    const accentStyle = dayCap > 0 ? `border-top: 3px solid ${accentCol};` : 'border-top: 3px solid var(--teal-dark);';
+    return `<div class="day-card" style="${accentStyle}">
       <div class="day-card-head">
-        <span class="day-card-name">${day}</span>
-        ${dayCap > 0 ? `<span class="day-card-cap">${used}/${dayCap} min${over?' ⚠':''}</span>` : ''}
+        <div>
+          <div class="day-card-name">${day}</div>
+          ${dayCap > 0 ? `<div class="day-card-cap">${used}/${dayCap} min${over ? ' ⚠' : ''}</div>` : ''}
+        </div>
       </div>
-      ${dayCap > 0 ? `<div class="cap-bar"><div class="cap-fill ${over?'over':''}" style="width:${pct}%"></div></div>` : ''}
+      ${dayCap > 0 ? `<div class="cap-bar"><div class="cap-fill ${over?'over':pct>=80?'warn':''}" style="width:${pct}%"></div></div>` : ''}
       ${dt.length === 0 ? `<div class="day-empty">Nothing allocated</div>` : dt.map(taskCard).join('')}
     </div>`;
   }).filter(Boolean).join('');
@@ -1027,17 +1038,20 @@ function renderP7() {
   // ---- Parked pool ----
   const parked = S.tasks.filter(t => !t.wse && t.priority === 'Parked');
   const parkedHtml = parked.length ? `
-    <div class="pool-section">
-      <div class="pool-head">
+    <details class="pool-section">
+      <summary class="pool-head" style="cursor:pointer;user-select:none">
         <span class="pool-head-title">Parked — Not This Week</span>
-        <span class="pool-badge" style="background:var(--grey-mid)">${parked.length}</span>
-      </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="pool-badge" style="background:var(--grey-mid)">${parked.length}</span>
+          <span class="pool-chevron">▾</span>
+        </div>
+      </summary>
       ${parked.map(t => `<div class="pool-task">
         <span class="pool-task-text">${esc(t.task)}</span>
         ${t.minutes ? `<span style="font-size:12px;color:var(--grey-mid)">${t.minutes}m</span>` : ''}
         <button class="btn-done" onclick="markDone(${t.id})">Done</button>
       </div>`).join('')}
-    </div>` : '';
+    </details>` : '';
 
   // ---- WSE pool ----
   const wse = S.tasks.filter(t => t.wse);

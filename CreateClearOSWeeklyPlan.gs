@@ -64,11 +64,7 @@ function createClearOSWeeklyPlan() {
   // Open the file for the user
   var url = ss.getUrl();
 
-  Browser.msgBox(
-    'Your CLEAR OS Weekly Plan is ready!',
-    'Bookmark this spreadsheet and make a copy each Monday morning.\\n\\nURL: ' + url,
-    Browser.Buttons.OK
-  );
+  Logger.log('Your CLEAR OS Weekly Plan is ready! URL: ' + url);
 }
 
 // ─── DATA TAB ────────────────────────────────────────────────────────────────

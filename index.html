@@ -382,6 +382,7 @@ let S = {
 let sortDir = 'asc';
 let editingId = null;
 let notesOpen = new Set();
+let advancedInput = false;
 
 // ---- Persistence ----
 function save() { localStorage.setItem(KEY, JSON.stringify(S)); }

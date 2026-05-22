@@ -1,8 +1,8 @@
 const CACHE = 'clearos-v1';
 const ASSETS = [
-  '/clearos-weekly-plan/',
-  '/clearos-weekly-plan/index.html',
-  '/clearos-weekly-plan/manifest.json'
+  '/',
+  '/index.html',
+  '/manifest.json'
 ];
 
 self.addEventListener('install', e => {

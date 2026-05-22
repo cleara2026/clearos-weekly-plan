@@ -330,6 +330,16 @@ const SNAPSHOT = null;
 
 // ---- Constants ----
 const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+const DAY_COLORS = {
+  Monday:    '#3b82f6',
+  Tuesday:   '#8b5cf6',
+  Wednesday: '#10b981',
+  Thursday:  '#f59e0b',
+  Friday:    '#ef4444',
+  Saturday:  '#06b6d4',
+  Sunday:    '#ec4899'
+};
+function dayColor(d) { return DAY_COLORS[d] || 'var(--teal-dark)'; }
 const TTR = 'Things to Remember';
 const ALL_DAYS = [...DAYS, TTR];
 const STEP_NAMES = ['Clarity','List','Estimate','Urgent Block','High Block','Allocate','Roadmap'];
@@ -956,7 +966,7 @@ function renderP6() {
         <div class="alloc-task" title="${esc(t.task)}">${esc(t.task)}</div>
         ${t.minutes ? `<span class="alloc-mins">${t.minutes}m</span>` : ''}
         ${needsDay
-          ? `<select class="day-select" onchange="setDay(${t.id},this.value)">${mkDayOpts(t)}</select>`
+          ? (() => { const dc = t.dayBlock && DAY_COLORS[t.dayBlock] ? `color:${DAY_COLORS[t.dayBlock]};border-color:${DAY_COLORS[t.dayBlock]}` : ''; return `<select class="day-select" style="${dc}" onchange="setDay(${t.id},this.value)">${mkDayOpts(t)}</select>`; })()
           : `<span style="font-size:12px;color:var(--grey-mid)">→ Things to Remember</span>`}
       </div>`;
     });
@@ -1169,6 +1179,7 @@ function renderP7() {
   }
 
   const isWeekend = d => d === 'Saturday' || d === 'Sunday';
+  const dayLabel = d => d === TTR ? 'Unallocated' : d;
 
   const cards = ALL_DAYS.map(day => {
     const isTTR = day === TTR;
@@ -1184,12 +1195,11 @@ function renderP7() {
     const pct = dayCap > 0 ? Math.min(100, Math.round(used / dayCap * 100)) : 0;
     const over = dayCap > 0 && used > dayCap;
 
-    const accentCol = over ? 'var(--red)' : (pct >= 80 ? 'var(--orange)' : 'var(--teal-dark)');
-    const accentStyle = dayCap > 0 ? `border-top: 3px solid ${accentCol};` : 'border-top: 3px solid var(--teal-dark);';
-    return `<div class="day-card" style="${accentStyle}">
+    const col = isTTR ? 'var(--grey-mid)' : dayColor(day);
+    return `<div class="day-card" style="border-top:3px solid ${col}">
       <div class="day-card-head">
         <div>
-          <div class="day-card-name">${day}</div>
+          <div class="day-card-name" style="color:${col}">${dayLabel(day)}</div>
           ${dayCap > 0 ? `<div class="day-card-cap">${used}/${dayCap} min${over ? ' ⚠' : ''}</div>` : ''}
         </div>
       </div>

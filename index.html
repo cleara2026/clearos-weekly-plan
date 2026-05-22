@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-title" content="CLEAR OS">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon.svg">
-<title>CLEAR OS — Weekly Plan</title>
+<title>CLEAR OS: Weekly Plan</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
@@ -189,6 +189,12 @@ main { max-width: 1400px; margin: 0 auto; padding: 32px 40px 80px; }
 .obs-box.warn { border-left-color: var(--orange); }
 .obs-box.over { border-left-color: var(--red); }
 .urgency-friction { padding: 12px 16px; font-size: 13px; line-height: 1.55; color: var(--grey-dark); background: #fff0f0; border-top: 1px solid #ffd0d0; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; }
+.cap-placeholder { padding: 24px 18px; border-radius: 10px; font-size: 14px; color: var(--grey-mid); border: 1.5px dashed var(--grey-border); text-align: center; margin-bottom: 20px; font-style: italic; }
+.cap-decision { padding: 15px 18px; border-radius: 10px; font-size: 14px; line-height: 1.55; margin-bottom: 20px; }
+.cap-good { background: #f0fff4; border: 1px solid #b8e8c8; color: #1a7a40; }
+.cap-warn { background: #fff8f0; border: 1px solid #fdd8a8; color: #b45309; }
+.cap-over { background: #fff0f0; border: 1px solid #ffc8c8; color: var(--red); }
+.cap-neutral { background: var(--grey-light); border: 1px solid var(--grey-border); color: var(--grey-mid); }
 .delta-callout { border-radius: 8px; padding: 11px 14px; font-size: 13px; color: var(--grey-dark); line-height: 1.5; border: 1px solid #fdd8a8; background: #fff8f0; margin-bottom: 12px; }
 .delta-callout strong { color: var(--orange); }
 
@@ -345,7 +351,7 @@ const DAY_COLORS = {
 function dayColor(d) { return DAY_COLORS[d] || 'var(--teal-dark)'; }
 const TTR = 'Things to Remember';
 const ALL_DAYS = [...DAYS, TTR];
-const STEP_NAMES = ['Clarity','List','Estimate','Urgent Block','High Block','Allocate','Roadmap'];
+const STEP_NAMES = ['Clarity','List','Estimate','Urgent Block','High Block','Capacity','Allocate','Roadmap'];
 const KEY = 'clearos_v3';
 
 // ---- State ----
@@ -449,7 +455,7 @@ function importFile() {
     if (idx < 0) { alert('No plan data found in this file. Make sure you\'re opening a saved CLEAROS file.'); return; }
     const jsonStart = idx + marker.length;
     const jsonEnd = text.indexOf(';\n', jsonStart);
-    if (jsonEnd < 0) { alert('Could not read this file — it may be corrupted.'); return; }
+    if (jsonEnd < 0) { alert('Could not read this file. It may be corrupted.'); return; }
     const jsonStr = text.slice(jsonStart, jsonEnd);
     if (jsonStr === 'null') { alert('This file has no saved plan. Use Save as file from the Roadmap step to create a plan file.'); return; }
     try {
@@ -457,7 +463,7 @@ function importFile() {
       S = { ...S, ...loaded };
       save(); render();
     } catch(err) {
-      alert('Could not read the plan file — it may be corrupted.');
+      alert('Could not read the plan file. It may be corrupted.');
     }
   };
   input.click();
@@ -492,9 +498,12 @@ function initSortables() {
   if (S.step === 2) makeSort('taskList');
   if (S.step === 4) makeSort('urgentList');
   if (S.step === 5) makeSort('highList');
-  if (S.step === 6) { makeSort('allocUrgent'); makeSort('allocHigh'); }
-  if (S.step === 7 && S.skipAllocation) { makeSort('priUrgent'); makeSort('priHigh'); }
+  if (S.step === 7 && S.skipAllocation) { makeSort('allocUrgent'); makeSort('allocHigh'); }
   if (S.step === 7 && !S.skipAllocation) {
+    ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday','Things_to_Remember'].forEach(d => makeSort('dayTasks-' + d));
+  }
+  if (S.step === 8 && S.skipAllocation) { makeSort('priUrgent'); makeSort('priHigh'); }
+  if (S.step === 8 && !S.skipAllocation) {
     ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday','Things_to_Remember'].forEach(d => makeSort('dayTasks-' + d));
   }
 }
@@ -503,7 +512,7 @@ function initSortables() {
 function skipAlloc() {
   S.skipAllocation = true;
   S.tasks.forEach(t => { t.dayBlock = null; });
-  save(); go(7);
+  save(); go(8);
 }
 
 function unskipAlloc() {
@@ -512,7 +521,7 @@ function unskipAlloc() {
 }
 
 // ---- Navigation ----
-function go(n) { if (n < 1 || n > 7) return; S.step = n; save(); render(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+function go(n) { if (n < 1 || n > 8) return; S.step = n; save(); render(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
 function next() { go(S.step + 1); }
 function prev() { go(S.step - 1); }
 
@@ -542,13 +551,13 @@ function dayCapacity(day) { return Math.floor((S.mf[day]||0) / 2); }
 // ---- Render ----
 function render() {
   renderSteps();
-  const fns = [null, renderP1, renderP2, renderP3, renderP4, renderP5, renderP6, renderP7, renderP8];
+  const fns = [null, renderP1, renderP2, renderP3, renderP4, renderP5, renderP6, renderP7, renderP8, renderP9];
   document.getElementById('main').innerHTML = fns[S.step]();
   afterRender(true);
 }
 
 function renderSteps() {
-  const n = 7;
+  const n = 8;
   let h = '';
   for (let i = 1; i <= n; i++) {
     const done = i < S.step, active = i === S.step;
@@ -568,7 +577,7 @@ function afterRender(fullRender) {
 }
 
 function rerender() {
-  const fns = [null, renderP1, renderP2, renderP3, renderP4, renderP5, renderP6, renderP7, renderP8];
+  const fns = [null, renderP1, renderP2, renderP3, renderP4, renderP5, renderP6, renderP7, renderP8, renderP9];
   document.getElementById('main').innerHTML = fns[S.step]();
   afterRender(false);
 }
@@ -606,7 +615,7 @@ function renderP1() {
   let h = '';
 
   if (carryover.length) {
-    h += `<div class="card"><div class="card-title">Carried over — not marked done last week</div>`;
+    h += `<div class="card"><div class="card-title">Carried over from last week</div>`;
     carryover.forEach(t => {
       h += `<div class="clarity-row">
         <div class="clarity-row-body">
@@ -627,7 +636,7 @@ function renderP1() {
   }
 
   if (waiting.length) {
-    h += `<div class="card"><div class="card-title">With someone else — waiting on others</div>`;
+    h += `<div class="card"><div class="card-title">With someone else</div>`;
     waiting.forEach(t => {
       h += `<div class="clarity-row">
         <div class="clarity-row-body">
@@ -713,7 +722,7 @@ function renderP2() {
     <div class="card">
       <div class="add-row">
         <input class="add-input" id="addInput" type="text"
-          placeholder="Add a task — Enter to add, or paste a list"
+          placeholder="Add a task (press Enter, or paste a list)"
           onkeydown="addKey(event)" onpaste="pasteHandler(event)" />
         <button class="btn btn-primary" onclick="addFromInput()">Add</button>
         ${tasks.length > 1 ? `<button class="btn btn-sm btn-secondary" onclick="toggleSort()">${sortLbl}</button>` : ''}
@@ -794,7 +803,7 @@ function renderP3() {
     <div class="est-row">
       <span class="est-task">${esc(t.task)}</span>
       <input class="est-input" type="number" min="0" step="5" tabindex="${i+1}"
-        placeholder="—" value="${t.minutes||''}" id="est_${t.id}"
+        placeholder="0" value="${t.minutes||''}" id="est_${t.id}"
         onchange="setMinutes(${t.id},this.value)" />
       <span class="est-unit">min</span>
     </div>`).join('');
@@ -869,7 +878,7 @@ function renderP4() {
     <div class="card" id="urgentList">
       ${rows || '<div style="text-align:center;padding:32px;color:var(--grey-mid);font-style:italic">No tasks to prioritise.</div>'}
       ${urgentCount > 0 ? `<div class="totals-row"><span><strong>${urgentCount}</strong> task${urgentCount!==1?'s':''} marked urgent</span></div>` : ''}
-      ${urgentCount > 3 ? `<div class="urgency-friction">You have <strong>${urgentCount} urgent tasks.</strong> In this run through, urgent means it <strong>has to be done by this time next week — or you're in trouble.</strong> The next pass (High) is the things you want to get done if capacity allows.</div>` : ''}
+      ${urgentCount > 3 ? `<div class="urgency-friction">You have <strong>${urgentCount} urgent tasks.</strong> In this run through, urgent means it <strong>has to be done by this time next week. Or you're in trouble.</strong> The next pass (High) is the things you want to get done if capacity allows.</div>` : ''}
     </div>
     <div class="step-nav">
       <button class="btn btn-ghost" onclick="prev()">← Estimate</button>
@@ -911,7 +920,7 @@ function renderP5() {
       <div class="warn-icon">💡</div>
       <div>
         <div class="warn-title">What is HIGH priority?</div>
-        <div class="warn-text">High means you would <strong>like</strong> to get this done this week if capacity allows. Be realistic — how many can you genuinely complete alongside your ${urgentCount} urgent task${urgentCount!==1?'s':''}? Everything not marked High or Urgent will be set to Parked.</div>
+        <div class="warn-text">High means you would <strong>like</strong> to get this done this week if capacity allows. Be realistic. How many can you genuinely complete alongside your ${urgentCount} urgent task${urgentCount!==1?'s':''}? Everything not marked High or Urgent will be set to Parked.</div>
       </div>
     </div>
     <div class="card" id="highList">
@@ -938,56 +947,9 @@ function applyDefaultsAndNext() {
 }
 
 // ============================================================
-// P6 — Allocate
+// P6 — Capacity
 // ============================================================
 function renderP6() {
-  const tasks = S.tasks.filter(t => !t.wse);
-
-  const groups = [
-    { label: 'Urgent', cls: 'badge-urgent', items: tasks.filter(t => t.priority === 'Urgent') },
-    { label: 'High', cls: 'badge-high', items: tasks.filter(t => t.priority === 'High') },
-    { label: 'Parked', cls: 'badge-parked', items: tasks.filter(t => t.priority === 'Parked') }
-  ].filter(g => g.items.length > 0);
-
-  function mkDayOpts(t) {
-    let opts = `<option value="" ${!t.dayBlock?'selected':''}>Day…</option>`;
-    ALL_DAYS.forEach(d => {
-      const label = d === TTR ? 'Things to Remember' : d;
-      opts += `<option value="${d}" ${t.dayBlock===d?'selected':''}>${label}</option>`;
-    });
-    return opts;
-  }
-
-  let rows = '';
-  groups.forEach(g => {
-    const gid = g.label === 'Urgent' ? 'allocUrgent' : g.label === 'High' ? 'allocHigh' : 'allocParked';
-    if (g.label === 'Parked') {
-      rows += `<details class="alloc-parked"><summary class="alloc-parked-summary"><span>Parked — Not This Week <span style="font-weight:400;opacity:.6">(${g.items.length})</span></span><span class="pool-chevron">▾</span></summary><div id="${gid}">`;
-    } else {
-      rows += `<div class="card-title" style="background:var(--grey-light)">${g.label} <span style="font-weight:400;opacity:.6">(${g.items.length})</span></div><div id="${gid}">`;
-    }
-    g.items.forEach(t => {
-      const needsDay = t.priority !== 'Parked';
-      rows += `<div class="alloc-row" data-id="${t.id}">
-        <span class="drag-handle" title="Drag to reorder"><svg width="10" height="14" viewBox="0 0 10 14" fill="none"><circle cx="3" cy="2.5" r="1.5" fill="currentColor"/><circle cx="7" cy="2.5" r="1.5" fill="currentColor"/><circle cx="3" cy="7" r="1.5" fill="currentColor"/><circle cx="7" cy="7" r="1.5" fill="currentColor"/><circle cx="3" cy="11.5" r="1.5" fill="currentColor"/><circle cx="7" cy="11.5" r="1.5" fill="currentColor"/></svg></span>
-        <div class="alloc-task" title="${esc(t.task)}">${esc(t.task)}</div>
-        ${t.minutes ? `<span class="alloc-mins">${t.minutes}m</span>` : ''}
-        ${needsDay
-          ? (() => { const dc = t.dayBlock && DAY_COLORS[t.dayBlock] ? `color:${DAY_COLORS[t.dayBlock]};border-color:${DAY_COLORS[t.dayBlock]};font-weight:600` : ''; return `<select class="day-select" style="${dc}" onchange="setDay(${t.id},this.value)">${mkDayOpts(t)}</select>`; })()
-          : `<span style="font-size:12px;color:var(--grey-mid)">→ Things to Remember</span>`}
-      </div>`;
-    });
-    rows += g.label === 'Parked' ? '</div></details>' : '</div>';  // close group div
-  });
-
-  // ---- Capacity inputs ----
-  const mfCells = DAYS.map(d => `
-    <div class="mf-cell">
-      <div class="mf-day-lbl">${d.slice(0,3)}</div>
-      <input class="mf-input" type="number" min="0" step="30" placeholder="0"
-        value="${S.mf[d]||''}" onchange="setMf('${d}',this.value)" />
-    </div>`).join('');
-
   const cap = totalCapacity();
   const committed = committedMins();
   const ratio = cap > 0 && committed > 0 ? committed / cap : 0;
@@ -999,42 +961,137 @@ function renderP6() {
   const urgHighTasks = S.tasks.filter(t => !t.wse && (t.priority === 'Urgent' || t.priority === 'High'));
   const unestimated = urgHighTasks.filter(t => !t.minutes).length;
   const unestimatedHtml = unestimated > 0
-    ? `<div class="delta-callout"><strong>${unestimated} urgent/high task${unestimated !== 1 ? 's have' : ' has'} no time estimate</strong> — your actual commitment is likely higher than shown below.</div>`
+    ? `<div class="delta-callout"><strong>${unestimated} urgent/high task${unestimated !== 1 ? 's have' : ' has'} no time estimate.</strong> Your actual commitment may be higher than shown.</div>`
     : '';
 
   const lastWeekA = S.history.length > 0 ? S.history[S.history.length - 1] : null;
   const lastWeekRatio = lastWeekA && lastWeekA.capacity > 0 ? lastWeekA.planned / lastWeekA.capacity : 0;
   const historyNote = lastWeekA && lastWeekA.capacity > 0
-    ? ` Last week your plan was <strong>${lastWeekRatio.toFixed(1)}x</strong> your capacity${lastWeekA.carryOverTasks > 0 ? ` — ${lastWeekA.carryOverTasks} task${lastWeekA.carryOverTasks !== 1 ? 's' : ''} carried over` : ''}.`
+    ? ` Last week your plan was <strong>${lastWeekRatio.toFixed(1)}x</strong> your capacity${lastWeekA.carryOverTasks > 0 ? `, with ${lastWeekA.carryOverTasks} task${lastWeekA.carryOverTasks !== 1 ? 's' : ''} carried over` : ''}.`
     : '';
 
-  const realityHtml = cap > 0 ? `
+  let decisionHtml = '';
+  if (cap > 0) {
+    let decCls, decMsg, decAction = '';
+    if (committed === 0) {
+      decCls = 'cap-decision cap-neutral';
+      decMsg = 'Add time estimates to your tasks in the Estimate step to see whether your plan is realistic.';
+    } else if (ratio < 0.9) {
+      decCls = 'cap-decision cap-good';
+      decMsg = `Your plan looks achievable. You have committed ${fmtMins(committed)} across ${fmtMins(cap)} of available time. Head to Allocate and plan your days.`;
+    } else if (ratio < 1.1) {
+      decCls = 'cap-decision cap-warn';
+      decMsg = `Your plan is tight. You have committed ${fmtMins(committed)} against ${fmtMins(cap)} available. There is little room if the unexpected arrives.`;
+    } else if (ratio < 1.5) {
+      decCls = 'cap-decision cap-over';
+      decMsg = `You are over-committed: ${fmtMins(committed)} planned against ${fmtMins(cap)} available. Consider going back to move some High tasks to Parked, or add more available hours above.`;
+      decAction = `<div style="margin-top:10px"><button class="btn btn-secondary btn-sm" onclick="go(5)">Adjust priorities</button></div>`;
+    } else {
+      decCls = 'cap-decision cap-over';
+      decMsg = `Your commitments are ${ratio.toFixed(1)}x your available capacity. This plan will not hold. Go back and take tasks out of this week, or this week will not be executable.`;
+      decAction = `<div style="margin-top:10px"><button class="btn btn-secondary btn-sm" onclick="go(5)">Adjust priorities</button></div>`;
+    }
+    decisionHtml = `<div class="${decCls}">${decMsg}${decAction}</div>`;
+  }
+
+  const revealHtml = cap > 0 ? `
     ${unestimatedHtml}
     <div class="reality-strip">
       <div class="reality-card">
         <div class="reality-lbl">Urgent + High Work</div>
         <div class="reality-val">${committed}<span style="font-size:13px;font-weight:400;color:var(--grey-mid)"> min</span></div>
-        <div class="reality-sub">${fmtMins(committed)||'—'} to commit this week</div>
+        <div class="reality-sub">${fmtMins(committed) || 'no estimates yet'}</div>
       </div>
       <div class="reality-card">
         <div class="reality-lbl">Available Capacity</div>
         <div class="reality-val ok">${cap}<span style="font-size:13px;font-weight:400;color:var(--grey-mid)"> min</span></div>
-        <div class="reality-sub">${fmtMins(cap)||'—'} usable (50% of meeting-free)</div>
+        <div class="reality-sub">${fmtMins(cap) || '-'} usable this week</div>
       </div>
       <div class="reality-card">
         <div class="reality-lbl">${delta >= 0 ? 'Overcommitted' : 'Capacity Remaining'}</div>
         <div class="reality-val ${delta > 0 ? 'over' : 'ok'}">${Math.abs(delta)}<span style="font-size:13px;font-weight:400;color:var(--grey-mid)"> min</span></div>
-        <div class="reality-sub">${fmtMins(Math.abs(delta))||'—'}</div>
+        <div class="reality-sub">${fmtMins(Math.abs(delta)) || '-'}</div>
       </div>
       <div class="reality-card">
         <div class="reality-lbl">Commitment Ratio</div>
-        <div class="reality-val ${ratioClass}">${committed > 0 ? ratio.toFixed(2) : '—'}<span style="font-size:13px;font-weight:400;color:var(--grey-mid)">${committed > 0 ? 'x' : ''}</span></div>
+        <div class="reality-val ${ratioClass}">${committed > 0 ? ratio.toFixed(2) : '-'}<span style="font-size:13px;font-weight:400;color:var(--grey-mid)">${committed > 0 ? 'x' : ''}</span></div>
         <div class="reality-sub">${ratio > 0 ? (ratio >= 1 ? Math.round((ratio-1)*100)+'% over capacity' : Math.round((1-ratio)*100)+'% under capacity') : 'no estimates yet'}</div>
       </div>
     </div>
-    <div class="obs-box ${obsClass}">${getRoadmapObs(ratio, cap, committed, urgHighTasks.length)}${historyNote}</div>` : '';
+    ${decisionHtml}
+    <div class="obs-box ${obsClass}">${getRoadmapObs(ratio, cap, committed, urgHighTasks.length)}${historyNote}</div>`
+    : `<div class="cap-placeholder">Enter your available hours above and your capacity check will appear here.</div>`;
 
-  // Skip mode — just priority list with drag handles
+  const hrsCells = DAYS.map(d => {
+    const hrs = S.mf[d] ? (S.mf[d] / 60) : '';
+    return `<div class="mf-cell">
+      <div class="mf-day-lbl">${d.slice(0,3)}</div>
+      <input class="mf-input" type="number" min="0" max="16" step="0.5" placeholder="0"
+        value="${hrs}" onchange="setHours('${d}',this.value)" />
+    </div>`;
+  }).join('');
+
+  return `
+    <div class="panel-title">Capacity</div>
+    <div class="panel-hint">How many hours do you have available for focused work each day this week?</div>
+    <div class="card" style="margin-bottom:20px">
+      <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+        <span>Hours available per day</span>
+        <span style="font-size:11px;font-weight:400;text-transform:none;letter-spacing:0;color:var(--grey-mid);white-space:nowrap">We use half as your realistic working time</span>
+      </div>
+      <div style="padding:14px 16px 16px"><div class="mf-grid">${hrsCells}</div></div>
+    </div>
+    ${revealHtml}
+    <div class="step-nav">
+      <button class="btn btn-ghost" onclick="prev()">← High Block</button>
+      <button class="btn btn-primary" onclick="go(7)">Plan my days →</button>
+    </div>`;
+}
+
+// ============================================================
+// P7 — Allocate
+// ============================================================
+function renderP7() {
+  const tasks = S.tasks.filter(t => !t.wse);
+
+  const groups = [
+    { label: 'Urgent', cls: 'badge-urgent', items: tasks.filter(t => t.priority === 'Urgent') },
+    { label: 'High', cls: 'badge-high', items: tasks.filter(t => t.priority === 'High') },
+    { label: 'Parked', cls: 'badge-parked', items: tasks.filter(t => t.priority === 'Parked') }
+  ].filter(g => g.items.length > 0);
+
+  function mkDayOpts(t) {
+    let opts = `<option value="" ${!t.dayBlock?'selected':''}>Day...</option>`;
+    ALL_DAYS.forEach(d => {
+      const label = d === TTR ? 'Things to Remember' : d;
+      opts += `<option value="${d}" ${t.dayBlock===d?'selected':''}>${label}</option>`;
+    });
+    return opts;
+  }
+
+  let rows = '';
+  groups.forEach(g => {
+    const gid = g.label === 'Urgent' ? 'allocUrgent' : g.label === 'High' ? 'allocHigh' : 'allocParked';
+    if (g.label === 'Parked') {
+      rows += `<details class="alloc-parked"><summary class="alloc-parked-summary"><span>Parked: Not This Week <span style="font-weight:400;opacity:.6">(${g.items.length})</span></span><span class="pool-chevron">▾</span></summary><div id="${gid}">`;
+    } else {
+      rows += `<div class="card-title" style="background:var(--grey-light)">${g.label} <span style="font-weight:400;opacity:.6">(${g.items.length})</span></div><div id="${gid}">`;
+    }
+    g.items.forEach(t => {
+      const needsDay = t.priority !== 'Parked';
+      rows += `<div class="alloc-row" data-id="${t.id}">
+        <span class="drag-handle" title="Drag to reorder"><svg width="10" height="14" viewBox="0 0 10 14" fill="none"><circle cx="3" cy="2.5" r="1.5" fill="currentColor"/><circle cx="7" cy="2.5" r="1.5" fill="currentColor"/><circle cx="3" cy="7" r="1.5" fill="currentColor"/><circle cx="7" cy="7" r="1.5" fill="currentColor"/><circle cx="3" cy="11.5" r="1.5" fill="currentColor"/><circle cx="7" cy="11.5" r="1.5" fill="currentColor"/></svg></span>
+        <div class="alloc-task" title="${esc(t.task)}">${esc(t.task)}</div>
+        ${t.minutes ? `<span class="alloc-mins">${t.minutes}m</span>` : ''}
+        ${needsDay
+          ? (() => { const dc = t.dayBlock && DAY_COLORS[t.dayBlock] ? `color:${DAY_COLORS[t.dayBlock]};border-color:${DAY_COLORS[t.dayBlock]};font-weight:600` : ''; return `<select class="day-select" style="${dc}" onchange="setDay(${t.id},this.value)">${mkDayOpts(t)}</select>`; })()
+          : `<span style="font-size:12px;color:var(--grey-mid)">Things to Remember</span>`}
+      </div>`;
+    });
+    rows += g.label === 'Parked' ? '</div></details>' : '</div>';
+  });
+
+  // Skip mode: priority list with drag handles
   if (S.skipAllocation) {
     const urgItems = S.tasks.filter(t => !t.wse && t.priority === 'Urgent');
     const highItems = S.tasks.filter(t => !t.wse && t.priority === 'High');
@@ -1045,39 +1102,28 @@ function renderP6() {
     </div>`;
     return `
       <div class="panel-title">Allocate</div>
-      <div class="panel-hint">Working from your priority list. Drag to set the order you'll work through them.</div>
+      <div class="panel-hint">Working from your priority list. Drag to set the order you will work through them.</div>
       <div style="margin-bottom:16px">
-        <button class="btn btn-secondary btn-sm" onclick="unskipAlloc()">↩ Switch to day allocation</button>
+        <button class="btn btn-secondary btn-sm" onclick="unskipAlloc()">Switch to day allocation</button>
       </div>
       <div class="card"><div class="card-title" style="background:var(--grey-light);color:var(--red)">Urgent <span style="font-weight:400;opacity:.6">(${urgItems.length})</span></div><div id="allocUrgent">${urgItems.map(mkSkipRow).join('') || '<div style="padding:12px 16px;color:var(--grey-mid);font-style:italic;font-size:13px">No urgent tasks.</div>'}</div></div>
       <div class="card"><div class="card-title" style="background:var(--grey-light);color:var(--orange)">High <span style="font-weight:400;opacity:.6">(${highItems.length})</span></div><div id="allocHigh">${highItems.map(mkSkipRow).join('') || '<div style="padding:12px 16px;color:var(--grey-mid);font-style:italic;font-size:13px">No high priority tasks.</div>'}</div></div>
       <div class="step-nav">
-        <button class="btn btn-ghost" onclick="prev()">← High Block</button>
-        <button class="btn btn-primary" onclick="go(7)">Next: Roadmap →</button>
+        <button class="btn btn-ghost" onclick="prev()">← Capacity</button>
+        <button class="btn btn-primary" onclick="go(8)">Next: Roadmap →</button>
       </div>`;
   }
 
   return `
     <div class="panel-title">Allocate</div>
-    <div class="panel-hint">First, enter your available time this week. Then assign tasks to days.</div>
+    <div class="panel-hint">Assign your tasks to days. The daily bars show how full each day is getting.</div>
     <div style="margin-bottom:16px;text-align:right">
-      <button class="btn btn-secondary btn-sm" onclick="skipAlloc()">Skip — work from priority list →</button>
-    </div>
-    <div class="card" style="margin-bottom:0">
-      <div class="card-title" style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
-        <div>
-          <div>Meeting-free minutes per day</div>
-          <div style="font-size:11px;font-weight:400;text-transform:none;letter-spacing:0;color:var(--grey-mid);margin-top:3px">How much time is not blocked by meetings? We halve this to account for interruptions, admin, and the unexpected.</div>
-        </div>
-        <span style="font-size:11px;font-weight:400;text-transform:none;letter-spacing:0;color:var(--grey-mid);white-space:nowrap;padding-top:2px">Usable = 50%</span>
-      </div>
-      <div style="padding:14px 16px 16px"><div class="mf-grid">${mfCells}</div></div>
+      <button class="btn btn-secondary btn-sm" onclick="skipAlloc()">Skip: work from priority list</button>
     </div>
     ${mkDayCapStrip()}
-    ${realityHtml}
     <div class="card" style="margin-top:4px">${rows || '<div style="text-align:center;padding:32px;color:var(--grey-mid);font-style:italic">No tasks to allocate.</div>'}</div>
     <div class="step-nav">
-      <button class="btn btn-ghost" onclick="prev()">← High Block</button>
+      <button class="btn btn-ghost" onclick="prev()">← Capacity</button>
       <button class="btn btn-primary" onclick="applyDayDefaultsAndNext()">Next: Roadmap →</button>
     </div>`;
 }
@@ -1113,13 +1159,13 @@ function setDay(id, d) {
 
 function applyDayDefaultsAndNext() {
   if (!S.skipAllocation) S.tasks.forEach(t => { if (t.priority === 'Parked' && !t.dayBlock) t.dayBlock = TTR; });
-  save(); go(7);
+  save(); go(8);
 }
 
 // ============================================================
-// P7 — Roadmap
+// P8 — Roadmap
 // ============================================================
-function renderP7() {
+function renderP8() {
   // ---- Priority view (skip allocation mode) ----
   if (S.skipAllocation) {
     const urgent = S.tasks.filter(t => !t.wse && t.priority === 'Urgent');
@@ -1149,7 +1195,7 @@ function renderP7() {
 
     const parkedSection = parked.length ? `<details class="pool-section">
       <summary class="pool-head" style="cursor:pointer;user-select:none">
-        <span class="pool-head-title">Parked — Not This Week</span>
+        <span class="pool-head-title">Parked: Not This Week</span>
         <div style="display:flex;align-items:center;gap:8px"><span class="pool-badge" style="background:var(--grey-mid)">${parked.length}</span><span class="pool-chevron">▾</span></div>
       </summary>
       ${parked.map(t => `<div class="pool-task"><span class="pool-task-text">${esc(t.task)}</span>${t.minutes?`<span style="font-size:12px;color:var(--grey-mid)">${t.minutes}m</span>`:''}<button class="btn-done" onclick="markDone(${t.id})">Done</button></div>`).join('')}
@@ -1163,7 +1209,7 @@ function renderP7() {
       ${urgSection}${highSection}${parkedSection}${wseSection}
       <div class="new-week-bar">
         <div class="new-week-hint" style="font-size:15px;font-weight:600;color:var(--black);margin-bottom:6px">Done for the week?</div>
-        <div style="font-size:13px;color:var(--grey-mid);margin-bottom:16px">Save a copy of your plan. Next week, open this app and your unfinished tasks will be waiting in Clarity — ready to reprioritise.</div>
+        <div style="font-size:13px;color:var(--grey-mid);margin-bottom:16px">Save a copy of your plan. Next week, open this app and your unfinished tasks will be waiting in Clarity, ready to reprioritise.</div>
         <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
           <button class="btn btn-primary" onclick="saveAsFile()">Save as file</button>
           <button class="btn btn-secondary" onclick="window.print()">Print</button>
@@ -1226,7 +1272,7 @@ function renderP7() {
   const parkedHtml = parked.length ? `
     <details class="pool-section">
       <summary class="pool-head" style="cursor:pointer;user-select:none">
-        <span class="pool-head-title">Parked — Not This Week</span>
+        <span class="pool-head-title">Parked: Not This Week</span>
         <div style="display:flex;align-items:center;gap:8px">
           <span class="pool-badge" style="background:var(--grey-mid)">${parked.length}</span>
           <span class="pool-chevron">▾</span>
@@ -1262,7 +1308,7 @@ function renderP7() {
     ${parkedHtml}${wseHtml}
     <div class="new-week-bar">
       <div class="new-week-hint" style="font-size:15px;font-weight:600;color:var(--black);margin-bottom:6px">Done for the week?</div>
-      <div style="font-size:13px;color:var(--grey-mid);margin-bottom:16px">Save a copy of your plan. Next week, open this app and your unfinished tasks will be waiting in Clarity — ready to reprioritise.</div>
+      <div style="font-size:13px;color:var(--grey-mid);margin-bottom:16px">Save a copy of your plan. Next week, open this app and your unfinished tasks will be waiting in Clarity, ready to reprioritise.</div>
       <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
         <button class="btn btn-primary" onclick="saveAsFile()">Save as file</button>
         <button class="btn btn-secondary" onclick="window.print()">Print</button>
@@ -1275,19 +1321,20 @@ function renderP7() {
 
 function getRoadmapObs(ratio, cap, committed, taskCount) {
   if (cap === 0) return "Enter your meeting-free time above to see your commitment vs capacity.";
-  if (committed === 0) return "No time estimates on your urgent or high tasks — add estimates in the Estimate step to see your reality.";
+  if (committed === 0) return "No time estimates on your urgent or high tasks. Add estimates in the Estimate step to see your reality.";
   const n = taskCount || 0;
   const carryEst = ratio > 1 && n > 0 ? Math.round(n * (1 - 1 / ratio)) : 0;
   const carryStr = carryEst > 0 ? ` At this ratio, roughly <strong>${carryEst} task${carryEst !== 1 ? 's' : ''}</strong> will likely carry over.` : '';
   if (ratio < 0.6) return `Your committed work is ${Math.round(ratio*100)}% of your available capacity. Either you have room to take on more, or some tasks are still missing estimates.`;
-  if (ratio < 0.9) return "Your committed work is within capacity. Good position to execute from — you have a buffer for the unexpected.";
+  if (ratio < 0.9) return "Your committed work is within capacity. Good position to execute from. You have a buffer for the unexpected.";
   if (ratio < 1.1) return "Your committed work is close to your available capacity. Manageable if nothing unexpected lands this week.";
   if (ratio < 1.5) return `Your plan is ${ratio.toFixed(1)}x your available capacity.${carryStr} Consider moving lower-priority items to Parked now rather than letting the week decide.`;
-  if (ratio < 2.0) return `Your plan is ${ratio.toFixed(1)}x your available capacity.${carryStr} Significant carry-over is likely — be deliberate about what actually gets done first.`;
+  if (ratio < 2.0) return `Your plan is ${ratio.toFixed(1)}x your available capacity.${carryStr} Significant carry-over is likely. Be deliberate about what actually gets done first.`;
   return `Your plan is ${ratio.toFixed(1)}x your available capacity.${carryStr} This week's list needs fundamental reallocation before it's executable.`;
 }
 
 function setMf(day, v) { S.mf[day] = parseInt(v) || 0; save(); rerender(); }
+function setHours(day, v) { S.mf[day] = Math.round((parseFloat(v) || 0) * 60); save(); rerender(); }
 
 function markDone(id) { S.tasks = S.tasks.filter(t => t.id !== id); S.completedThisWeek++; save(); render(); }
 
@@ -1298,9 +1345,9 @@ function toggleWse(id) {
 }
 
 // ============================================================
-// P8 — Review (week 2+ only)
+// P9 — Review (week 2+ only)
 // ============================================================
-function renderP8() {
+function renderP9() {
   if (!S.history.length) return `
     <div class="panel-title">Review</div>
     <div class="panel-hint">Complete your first week to unlock your weekly review.</div>
@@ -1308,7 +1355,7 @@ function renderP8() {
 
   const h = S.history[S.history.length - 1];
   const compRate = h.totalTasks > 0 ? Math.round(h.completedTasks / h.totalTasks * 100) : 0;
-  const ratio = h.capacity > 0 ? (h.planned / h.capacity).toFixed(1) : '—';
+  const ratio = h.capacity > 0 ? (h.planned / h.capacity).toFixed(1) : '-';
   const obs = getReviewObs(h, compRate);
 
   return `
@@ -1332,7 +1379,7 @@ function renderP8() {
       </div>
       <div class="review-card">
         <div class="review-lbl">Plan vs Capacity</div>
-        <div class="review-val">${ratio}<span style="font-size:14px;font-weight:400;color:var(--grey-mid)">${ratio!=='—'?'x':''}</span></div>
+        <div class="review-val">${ratio}<span style="font-size:14px;font-weight:400;color:var(--grey-mid)">${ratio!=='-'?'x':''}</span></div>
         <div class="review-sub">${h.planned} min planned</div>
       </div>
     </div>
@@ -1347,9 +1394,9 @@ function getReviewObs(h, compRate) {
   const obs = [];
   const ratio = h.capacity > 0 ? h.planned / h.capacity : 0;
 
-  if (compRate >= 90) obs.push(`Strong execution — ${compRate}% of planned tasks completed. Your plan was realistic and you delivered against it.`);
+  if (compRate >= 90) obs.push(`Strong execution. ${compRate}% of planned tasks completed. Your plan was realistic and you delivered against it.`);
   else if (compRate >= 70) obs.push(`You completed ${compRate}% of planned tasks. Consider whether the carry-over was anticipated or arrived as a surprise.`);
-  else if (compRate >= 50) obs.push(`Your completion rate was ${compRate}%. Worth examining — was the plan unrealistic, or did unexpected work arrive mid-week?`);
+  else if (compRate >= 50) obs.push(`Your completion rate was ${compRate}%. Worth examining. Was the plan unrealistic, or did unexpected work arrive mid-week?`);
   else obs.push(`Your completion rate was ${compRate}%. Significant unexecuted work suggests the plan did not reflect the week's actual constraints.`);
 
   if (h.carryOverTasks > 0) {

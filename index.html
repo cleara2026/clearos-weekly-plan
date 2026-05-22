@@ -930,9 +930,9 @@ function renderP6() {
       </div>
       <div style="padding:14px 16px 16px"><div class="mf-grid">${mfCells}</div></div>
     </div>
+    ${mkDayCapStrip()}
     ${realityHtml}
     <div class="card" style="margin-top:4px">${rows || '<div style="text-align:center;padding:32px;color:var(--grey-mid);font-style:italic">No tasks to allocate.</div>'}</div>
-    ${mkDayCapStrip()}
     <div class="step-nav">
       <button class="btn btn-ghost" onclick="prev()">← High Block</button>
       <button class="btn btn-primary" onclick="applyDayDefaultsAndNext()">Next: Roadmap →</button>
@@ -1058,12 +1058,12 @@ function renderP7() {
     ${cards ? `<div class="day-cards">${cards}</div>` : `<div style="text-align:center;padding:40px;color:var(--grey-mid);font-size:14px;font-style:italic">No tasks allocated. Go back to Allocate to assign tasks to days.</div>`}
     ${parkedHtml}${wseHtml}
     <div class="new-week-bar">
-      <div class="new-week-hint">Save your plan — your data lives in this browser, so a saved file keeps it safe across devices and browser clears.</div>
-      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:12px">
+      <div class="new-week-hint" style="font-size:15px;font-weight:600;color:var(--black);margin-bottom:6px">Done for the week?</div>
+      <div style="font-size:13px;color:var(--grey-mid);margin-bottom:16px">Save a copy of your plan. Next week, open this app and your unfinished tasks will be waiting in Clarity — ready to reprioritise.</div>
+      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
         <button class="btn btn-primary" onclick="saveAsFile()">Save as file</button>
         <button class="btn btn-secondary" onclick="window.print()">Print</button>
       </div>
-      <div style="font-size:12px;color:var(--grey-mid)">Next week, open the app here and your carry-overs will be waiting in Clarity.</div>
     </div>
     <div class="step-nav">
       <button class="btn btn-ghost" onclick="prev()">← Allocate</button>
@@ -1204,13 +1204,6 @@ function confirmReset() {
 // ---- Init ----
 initState();
 render();
-
-// ---- Service worker (PWA offline support) ----
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').catch(() => {});
-  });
-}
 </script>
 </body>
 </html>
